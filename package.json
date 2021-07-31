@@ -1,0 +1,26 @@
+{
+  "name": "slash_commands.js",
+  "version": "1.2.1",
+  "description": "Make easy discord.js slash commands.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "slash",
+    "slash-commands",
+    "discord",
+    "commands",
+    "discord.js",
+    "discord.js-slash-commands"
+  ],
+  "author": "TheMinecrafter05",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^12.5.3"
+  }
+  "repository": {
+  "type": "git",
+  "url": "https://github.com/your-user/repo-url.git"
+  }
+}
