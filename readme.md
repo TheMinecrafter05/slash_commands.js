@@ -49,7 +49,7 @@ the __command__ option will be the command executed : the __interaction__ is nee
 - __slash.onExecute(client: Discord.Client, listener?: (command: string, interaction: any, args: any)__ - listen when a command gets executed
 - __slash.reply(client: any, interaction: any, text: any, private: boolean)__ - reply with a message or embed
 - __slash.edit(client: Discord.Client, message: any, interaction: any)__ - edit a message
-- __slash.remove(client: Discord.Client, interaction: any)__ - delete a message
+- __slash.remove(client: Discord.Client, interaction: any, timeout: number)__ - delete a message
 # WARNING
 ## Discord takes a lot of time to create or update a slash command. So be patient if you add one.
 ## Also you need to invite your bot with the application.commands permission:
