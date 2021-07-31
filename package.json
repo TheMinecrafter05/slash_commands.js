@@ -1,6 +1,6 @@
 {
   "name": "slash_commands.js",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Make easy discord.js slash commands.",
   "main": "index.js",
   "scripts": {
