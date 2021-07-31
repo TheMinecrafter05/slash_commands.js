@@ -251,13 +251,12 @@ async function reply(client, interaction,text, private=false){
         data: {
             type: 5,
             data:{
-                flags: private == true ? 64 : 0
+                flags: private == true ? 64 : 0,
             }
         }
     }).catch(err=>{
         if(err) {console.warn(err); return undefined;}
     })
-
     return await new discord.WebhookClient(client.user.id,interaction.token).send(typeof(text) == "object" ? {embeds:[text]} : text)
 }
 
@@ -273,14 +272,17 @@ async function edit(client, message, interaction){
     }
 }
 
-async function deleteslashCommand(client, cmd=""){
+async function deleteslashCommand(client, cmd="", timeout=0){
+    if(timeout > (1000 * 60 * 15) - 1000) timeout = (1000 * 60 * 15) - 1000;
     let f = setInterval(async ()=>{
         if(client.readyAt != null){
             clearInterval(f)
             let list = await client.api.applications(client.user.id).commands.get()
             list.forEach(command=>{
                 if(command.name == cmd){
-                    client.api.applications(client.user.id).commands(command.id).delete().catch(console.error)
+                    setTimeout(()=>{
+                        client.api.applications(client.user.id).commands(command.id).delete().catch(console.error)
+                    },timeout)
                 }
             })
         }
