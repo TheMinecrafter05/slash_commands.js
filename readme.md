@@ -51,7 +51,7 @@ the __command__ option will be the command executed : the __interaction__ is nee
 - __slash.edit(client: Discord.Client, message: any, interaction: any)__ - edit a message
 - __slash.remove(client: Discord.Client, interaction: any)__ - delete a message
 # WARNING
-## Discord takes a lot of time to create or update a slash command. So be pacient if you add one.
+## Discord takes a lot of time to create or update a slash command. So be paitent if you add one.
 ## Also you need to invite your bot with the application.commands permission:
 #### https://discord.com/api/oauth2/authorize?client_id=YOUR_CLIENT_ID&permissions=0scope=applications.commands%20bot
 
