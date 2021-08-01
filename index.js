@@ -65,6 +65,9 @@ class slashCommand{
                                         if(command.options[i].required != that.options[i].required){
                                             edit = true;
                                         }
+                                        if(command.options[i].type != that.options[i].type){
+                                            edit = true;
+                                        }
                                     }else{
                                         edit = true;
                                     }
@@ -121,8 +124,8 @@ class guildSlashCommand{
             return that;
         }
 
-        this.setGuildID = function(guildID=""){
-            if(!guildID) throw new Error("No guildID provided.");
+        this.setGuildID = function(guildID){
+            if(guildID == undefined) throw new Error("No guildID provided.");
             that.guildID = guildID;
             return that;
         }
@@ -131,7 +134,7 @@ class guildSlashCommand{
             let cmd = {}
             cmd["name"] = option["name"]
             cmd["description"] = option["description"]
-            cmd["type"] = 3
+            cmd["type"] = option["type"]
             cmd["required"] = option["required"]
             that.options.push(cmd)
             return that
@@ -143,7 +146,7 @@ class guildSlashCommand{
                 let option = options[i]
                 cmd["name"] = option["name"]
                 cmd["description"] = option["description"]
-                cmd["type"] = 3
+                cmd["type"] = option["type"]
                 cmd["required"] = option["required"]
                 that.options.push(cmd)
             }
@@ -173,6 +176,9 @@ class guildSlashCommand{
                                             edit = true;
                                         }
                                         if(command.options[i].required != that.options[i].required){
+                                            edit = true;
+                                        }
+                                        if(command.options[i].type != that.options[i].type){
                                             edit = true;
                                         }
                                     }else{
@@ -217,6 +223,7 @@ class slashOption{
         this.name = "";
         this.description = "";
         this.required = false;
+        this.type = 3;
         this.setName = function(name=""){
             if(!name) throw new Error("No name provided.");
             that.name = name
@@ -232,6 +239,21 @@ class slashOption{
         this.setRequired = function(state = false){
             if(state == undefined) throw new Error("No state provided.");
             that.required = state;
+            return that;
+        }
+
+        this.setType = function(type){
+            if(!type){ throw new Error("Invalid type provided.")}
+            if(type.toLowerCase() == "string"){ type = 3} else
+            if(type.toLowerCase() == "number") {type = 10} else
+            if(type.toLowerCase() == "boolean") {type = 5} else
+            if(type.toLowerCase() == "user") {type = 6} else
+            if(type.toLowerCase() == "channel") {type = 7} else
+            if(type.toLowerCase() == "role") {type = 8} else {
+                type = "unvalid"
+            }
+            if(type == "unvalid"){ throw new Error("Invalid type provided.")}
+            that.type = type;
             return that;
         }
     }
