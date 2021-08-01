@@ -19,7 +19,8 @@ const slash = require("slash_commands.js") //define the package
 //create a slash command option
 const helpcommandOption = new slash.slashOption() 
 .setName("name")
-.setDescription("Enter your name")
+.setDescription("enter your name")
+.setType("string")
 .setRequired(false)
 
 //create a command
