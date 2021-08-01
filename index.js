@@ -23,7 +23,7 @@ class slashCommand{
             let cmd = {}
             cmd["name"] = option["name"]
             cmd["description"] = option["description"]
-            cmd["type"] = 3
+            cmd["type"] = option["type"]
             cmd["required"] = option["required"]
             that.options.push(cmd)
         }
