@@ -6,6 +6,7 @@ declare module "slash_commands.js" {
      */
 
     export class slashCommand {
+        /** @param client The client the command gets added to.*/
         constructor(client?: any);
         /** Sets the name of the command*/
         public setName(name: string): slashCommand;
@@ -26,9 +27,9 @@ declare module "slash_commands.js" {
     /**
      * Creates a guild only slash command.
      * @param client The client the command gets added to.
-     */
-
+    */
     export class guildSlashCommand {
+        /** @param client The client the command gets added to.*/
         constructor(client?: any);
         /** Sets the name of the command*/
         public setName(name: string): guildSlashCommand;
@@ -62,12 +63,16 @@ declare module "slash_commands.js" {
         public setDescription(description: string) : slashOption;
         /** Sets the requirement of the option*/
         public setRequired(state: boolean) : slashOption
+        /** Sets the type of the option*/
+        public setType(type:"string"|"number"|"boolean"|"user"|"channel"|"role") : slashOption;
         /** Returns the name of the option*/
         readonly name: string;
         /** Returns the description of the option*/
         readonly description: string;
         /** Returns the requirement of the option*/
         readonly required: boolean;
+        /**Returns the type of the option */
+        readonly type : string;
     }
 
     /**
@@ -99,14 +104,15 @@ declare module "slash_commands.js" {
      * Delete a message sent with a slash command.
      * @param client The client that the message was sent from.
      * @param interaction The interaction that comes from the slash command.
+     * @param timeout The time in milliseconds when the message gets deleted.
      */
-    function remove(client: any, interaction: any): Promise<void>;
+    function remove(client: any, interaction: any, timeout:number): Promise<void>;
 
     /**
      * Delete a slash command.
      * @param client The client that the message was sent from.
      * @param command The command name of the command you want to delete.
-     */
+    */
 
     function deleteslashCommand(client: any, command: string): Promise<void>;
 }
