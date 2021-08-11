@@ -83,7 +83,9 @@ class slashCommand{
                         data: {
                             "name": that.name !== undefined ? that.name : "command",
                             "description": that.description !== undefined ? that.description : "A cool command",
-                            "options": that.options !== undefined ? that.options : []
+                            "options": that.options !== undefined ? that.options : [],
+                            "default_permission":true,
+                            "type":1
                         }
                     }).catch(err=>{
                         if(err) return new Error(err)
@@ -93,7 +95,9 @@ class slashCommand{
                         data: {
                             "name": that.name !== undefined ? that.name : "command",
                             "description": that.description !== undefined ? that.description : "A cool command",
-                            "options": that.options !== undefined ? that.options : []
+                            "options": that.options !== undefined ? that.options : [],
+                            "default_permission":true,
+                            "type":1
                         }
                     }).catch(err=>{
                         if(err) return new Error(err)
@@ -196,7 +200,9 @@ class guildSlashCommand{
                         data: {
                             "name": that.name !== undefined ? that.name : "command",
                             "description": that.description !== undefined ? that.description : "A cool command",
-                            "options": that.options !== undefined ? that.options : []
+                            "options": that.options !== undefined ? that.options : [],
+                            "default_permission":true,
+                            "type":1
                         }
                     }).catch(err=>{
                         if(err) return new Error(err)
@@ -206,7 +212,9 @@ class guildSlashCommand{
                         data: {
                             "name": that.name !== undefined ? that.name : "command",
                             "description": that.description !== undefined ? that.description : "A cool command",
-                            "options": that.options !== undefined ? that.options : []
+                            "options": that.options !== undefined ? that.options : [],
+                            "default_permission":true,
+                            "type":1
                         }
                     }).catch(err=>{
                         if(err) return new Error(err)
