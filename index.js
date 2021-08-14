@@ -302,21 +302,32 @@ async function edit(client, message, interaction){
     }
 }
 
-async function deleteslashCommand(client, cmd="", timeout=0){
-    if(timeout > (1000 * 60 * 15) - 1000) timeout = (1000 * 60 * 15) - 1000;
+async function deleteslashCommand(client, cmd=""){
     let f = setInterval(async ()=>{
         if(client.readyAt != null){
             clearInterval(f)
             let list = await client.api.applications(client.user.id).commands.get()
             list.forEach(command=>{
                 if(command.name == cmd){
-                    setTimeout(()=>{
-                        client.api.applications(client.user.id).commands(command.id).delete().catch(console.error)
-                    },timeout)
+                    client.api.applications(client.user.id).commands(command.id).delete().catch(console.error)
                 }
             })
         }
     },100)
 }
 
-module.exports = {slashCommand,guildSlashCommand,slashOption, onExecute, reply, remove,edit, deleteslashCommand}
+async function deleteGuildSlashCommand(client, cmd="", guildId=""){
+    let f = setInterval(async ()=>{
+        if(client.readyAt != null){
+            clearInterval(f)
+            let list = await client.api.applications(client.user.id).guilds(guildId).commands.get()
+            list.forEach(command=>{
+                if(command.name == cmd){
+                    client.api.applications(client.user.id).guilds(guildId).commands(command.id).delete().catch(console.error)
+                }
+            })
+        }
+    },100)
+}
+
+module.exports = {slashCommand,guildSlashCommand,slashOption, onExecute, reply, remove,edit, deleteslashCommand, deleteGuildSlashCommand}
