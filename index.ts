@@ -110,9 +110,18 @@ declare module "slash_commands.js" {
 
     /**
      * Delete a slash command.
-     * @param client The client that the message was sent from.
+     * @param client The client that has the slash command.
      * @param command The command name of the command you want to delete.
     */
 
     function deleteslashCommand(client: any, command: string): Promise<void>;
+
+    /**
+     * Delete a guild slash command.
+     * @param client The client that has the guild slash command.
+     * @param command The command name of the command you want to delete.
+     * @param guildId The guild ID of the guild command you want to delete.
+    */
+
+     function deleteslashCommand(client: any, command: string, guildId: string): Promise<void>;
 }
