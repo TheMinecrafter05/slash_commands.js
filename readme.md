@@ -31,18 +31,16 @@ const helpCommand = new slash.slashCommand(client /*your discord client*/)
 ```
 ## Respond Example
 ```javascript
-slash.onExecute(client, (command, interaction,args)=>{ //explanation is down below
-    if(command == "help"){ // test if the command executed is the help command
-        slash.reply(bot, interaction, "Hello!", false).then(msg=>{ //send a response (if you write true instead of false only you can see the message)
+slash.onExecute(client, (message)=>{
+    if(message.content == "help"){ // test if the command executed is the help command
+        slash.reply(message, "Hello!", false).then(msg=>{ //send a response (if you write true instead of false only you can see the message)
             setTimeout(()=>{
-                slash.edit(client,"bye!",interaction) //edit the message 
+                msg.edit({content:"bye!"}) //edit the message 
             },5000)
         })
     }
 })
 ```
-#### Explanation:
-the __command__ option will be the command executed : the __interaction__ is needed for sending a message back : the __args__ are what you enter in the options
 
 # Documentation
 - __new slash.slashCommand( client: Discord.Client )__ - Creates a new slash command
