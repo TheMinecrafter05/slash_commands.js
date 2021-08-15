@@ -1,3 +1,5 @@
+import { Channel, Client, Guild, GuildChannel, GuildMember, Message, User } from "discord.js";
+
 declare module "slash_commands.js" {
     
     /**
@@ -7,7 +9,7 @@ declare module "slash_commands.js" {
 
     export class slashCommand {
         /** @param client The client the command gets added to.*/
-        constructor(client?: any);
+        constructor(client?: Client);
         /** Sets the name of the command*/
         public setName(name: string): slashCommand;
         /** Sets the description of the command*/
@@ -30,7 +32,7 @@ declare module "slash_commands.js" {
     */
     export class guildSlashCommand {
         /** @param client The client the command gets added to.*/
-        constructor(client?: any);
+        constructor(client?: Client);
         /** Sets the name of the command*/
         public setName(name: string): guildSlashCommand;
         /** Sets the description of the command*/
@@ -65,6 +67,8 @@ declare module "slash_commands.js" {
         public setRequired(state: boolean) : slashOption
         /** Sets the type of the option*/
         public setType(type:"string"|"number"|"boolean"|"user"|"channel"|"role") : slashOption;
+        /**Sets the choices of the option */
+        public addChoices(choices:object[]) : slashOption;
         /** Returns the name of the option*/
         readonly name: string;
         /** Returns the description of the option*/
@@ -76,37 +80,62 @@ declare module "slash_commands.js" {
     }
 
     /**
+     * Creates a slash command option choice.
+    */
+
+     export class slashOptionChoice {
+        constructor();
+        /** Sets the name of the choice*/
+        public setName(name: string): slashOptionChoice;
+        /** Sets the value of the choice to identify it*/
+        public setValue(value: string) : slashOptionChoice;
+        /** Returns the name of the choice*/
+        readonly name: string;
+        /** Returns the value of the choice*/
+        readonly value: string;
+    }
+
+    class slashResponse{
+        readonly content: string;
+
+        readonly id:string;
+
+        readonly command_id:string;
+
+        readonly options:object
+
+        readonly channel:GuildChannel;
+
+        readonly guild: Guild;
+
+        readonly author: User;
+
+        readonly member: GuildMember;
+
+        readonly user: User;
+
+        readonly application_id:string;
+
+        readonly interaction: object;
+
+        readonly client: Client;
+    }
+
+    /**
      * Calls the listener when a slash command gets executed.
      * @param client The client that the message was sent from.
      * @param listener Gets called when a slash command gets executed. Returns void.
      */
-    function onExecute(client: any, listener : (command : string, interaction : any, args : object) => void) : Promise<void>;
+    function onExecute(client: Client, listener : (message: slashResponse) => void) : Promise<void>;
 
     /**
      * Respond to a slash command with a message or an embed.
-     * @param client The client that the message was sent from.
-     * @param interaction The interaction that comes from the slash command.
+     * @param message The API message from the onExecute event.
      * @param text The text or the embed that gets send.
      * @param private determines if the message is public or can only be seen by the author.
      */
 
-    function reply(client: any, interaction: any, text: string, private: boolean) : Promise<void>
-
-    /**
-     * Edit a message sent with a slash command.
-     * @param client The client that the message was sent from.
-     * @param text The text that the message gets edited to.
-     * @param interaction The interaction that comes from the slash command.
-     */
-    function edit(client: any, text: string, interaction: any): Promise<void>;
-
-    /**
-     * Delete a message sent with a slash command.
-     * @param client The client that the message was sent from.
-     * @param interaction The interaction that comes from the slash command.
-     * @param timeout The time in milliseconds when the message gets deleted.
-     */
-    function remove(client: any, interaction: any, timeout:number): Promise<void>;
+    function reply(message: slashResponse, text: string, private: boolean) : Promise<Message>
 
     /**
      * Delete a slash command.
@@ -114,7 +143,7 @@ declare module "slash_commands.js" {
      * @param command The command name of the command you want to delete.
     */
 
-    function deleteslashCommand(client: any, command: string): Promise<void>;
+    function deleteSlashCommand(client: Client, command: string): Promise<void>;
 
     /**
      * Delete a guild slash command.
@@ -123,5 +152,5 @@ declare module "slash_commands.js" {
      * @param guildId The guild ID of the guild command you want to delete.
     */
 
-     function deleteslashCommand(client: any, command: string, guildId: string): Promise<void>;
+     function deleteGuildSlashCommand(client: Client, command: string, guildId: string): Promise<void>;
 }
