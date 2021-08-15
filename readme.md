@@ -19,7 +19,7 @@ const slash = require("slash_commands.js") //define the package
 //create a slash command option
 const helpcommandOption = new slash.slashOption() 
 .setName("name")
-.setDescription("enter your name")
+.setDescription("Enter your name")
 .setType("string")
 .setRequired(false)
 
@@ -47,10 +47,10 @@ the __command__ option will be the command executed : the __interaction__ is nee
 # Documentation
 - __new slash.slashCommand( client: Discord.Client )__ - Creates a new slash command
 - __new slash.slashOption()__ - Creates a new slash option
-- __slash.onExecute(client: Discord.Client, listener?: (command: string, interaction: any, args: any)__ - listen when a command gets executed
-- __slash.reply(client: any, interaction: any, text: any, private: boolean)__ - reply with a message or embed
-- __slash.edit(client: Discord.Client, message: any, interaction: any)__ - edit a message
-- __slash.remove(client: Discord.Client, interaction: any, timeout: number)__ - delete a message
+- __new slash.slashOptionChoice()__ - Creates a new slash option choice
+- __slash.onExecute(client: Discord.Client, listener?: (message: any)__ - listen when a command gets executed
+- __slash.reply(message: any, text: any, private: boolean)__ - reply with a message or embed
+- reply returns a Discord message, so you can edit, delete, react etc.
 # WARNING
 ## Discord takes a lot of time to create or update a slash command. So be patient if you add one.
 ## Also you need to invite your bot with the application.commands permission:
