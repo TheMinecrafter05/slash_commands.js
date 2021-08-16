@@ -1,4 +1,15 @@
-const discord = require("discord.js")
+const discord = require("discord.js");
+const fetch = require("node-fetch");
+
+(async function wait(){
+    let pr = await fetch("https://raw.githubusercontent.com/TheMinecrafter05/slash_commands.js/main/package.json", {method:"GET"})
+    let r = await pr.json();
+    if(r.version != "1.5.5"){
+        setTimeout(()=>{
+            console.error("There is a new version of slash_commands.js available.\nInstall it using npm i slash_commands.js")
+        },5000)
+    }
+})()
 
 class slashCommand{
     constructor(client=discord.Client){
@@ -73,45 +84,49 @@ class slashCommand{
                         if(!command.options && that.options || command.options && !that.options){
                             edit = true
                         }else{
-                            for(var i=0;i<that.options.length;i++){
-                                if(command.options){
-                                    if(command.options[i]){
-                                        if(command.options[i].name != that.options[i].name){
-                                            edit = true;
-                                        }
-                                        if(command.options[i].description != that.options[i].description){
-                                            edit = true;
-                                        }
-                                        if(command.options[i].required != that.options[i].required){
-                                            edit = true;
-                                        }
-                                        if(command.options[i].type != that.options[i].type){
-                                            edit = true;
-                                        }
-                                        if(!command.options[i].choices && that.options[i].choices || command.options[i].choices && !that.options[i].choices){
-                                            edit = true;
-                                        }else{
-                                            if(command.options[i].choices.length != that.options[i].choices.length){
+                            if(command.options.length != that.options.length){
+                                edit = true;
+                            }else{
+                                for(var i=0;i<that.options.length;i++){
+                                    if(command.options){
+                                        if(command.options[i]){
+                                            if(command.options[i].name != that.options[i].name){
+                                                edit = true;
+                                            }
+                                            if(command.options[i].description != that.options[i].description){
+                                                edit = true;
+                                            }
+                                            if(command.options[i].required != that.options[i].required){
+                                                edit = true;
+                                            }
+                                            if(command.options[i].type != that.options[i].type){
+                                                edit = true;
+                                            }
+                                            if(!command.options[i].choices && that.options[i].choices || command.options[i].choices && !that.options[i].choices){
                                                 edit = true;
                                             }else{
-                                                for(o=0;o<that.options[i].length;o++){
-                                                    if(command.options[i].choices){
-                                                        if(command.options[i].choices[o].name != that.options[i].choices[o].name){
+                                                if(command.options[i].choices.length != that.options[i].choices.length){
+                                                    edit = true;
+                                                }else{
+                                                    for(o=0;o<that.options[i].length;o++){
+                                                        if(command.options[i].choices){
+                                                            if(command.options[i].choices[o].name != that.options[i].choices[o].name){
+                                                                edit = true;
+                                                            }
+                                                            if(command.options[i].choices[o].value != that.options[i].choices[o].value){
+                                                                edit = true;
+                                                            }
+                                                        }else{
                                                             edit = true;
                                                         }
-                                                        if(command.options[i].choices[o].value != that.options[i].choices[o].value){
-                                                            edit = true;
-                                                        }
-                                                    }else{
-                                                        edit = true;
                                                     }
                                                 }
                                             }
+                                        }else{
+                                            edit = true;
                                         }
-                                    }else{
-                                        edit = true;
-                                    }
-                                }else{edit = true}
+                                    }else{edit = true}
+                                }
                             }
                         }
                         if(edit == false) {fouund = true;}else{ id = command.id;}
@@ -232,45 +247,49 @@ class guildSlashCommand{
                         if(!command.options && that.options || command.options && !that.options){
                             edit = true
                         }else{
-                            for(var i=0;i<that.options.length;i++){
-                                if(command.options){
-                                    if(command.options[i]){
-                                        if(command.options[i].name != that.options[i].name){
-                                            edit = true;
-                                        }
-                                        if(command.options[i].description != that.options[i].description){
-                                            edit = true;
-                                        }
-                                        if(command.options[i].required != that.options[i].required){
-                                            edit = true;
-                                        }
-                                        if(command.options[i].type != that.options[i].type){
-                                            edit = true;
-                                        }
-                                        if(!command.options[i].choices && that.options[i].choices || command.options[i].choices && !that.options[i].choices){
-                                            edit = true;
-                                        }else{
-                                            if(command.options[i].choices.length != that.options[i].choices.length){
+                            if(command.options.length != that.options.length){
+                                edit = true;
+                            }else{
+                                for(var i=0;i<that.options.length;i++){
+                                    if(command.options){
+                                        if(command.options[i]){
+                                            if(command.options[i].name != that.options[i].name){
+                                                edit = true;
+                                            }
+                                            if(command.options[i].description != that.options[i].description){
+                                                edit = true;
+                                            }
+                                            if(command.options[i].required != that.options[i].required){
+                                                edit = true;
+                                            }
+                                            if(command.options[i].type != that.options[i].type){
+                                                edit = true;
+                                            }
+                                            if(!command.options[i].choices && that.options[i].choices || command.options[i].choices && !that.options[i].choices){
                                                 edit = true;
                                             }else{
-                                                for(o=0;o<that.options[i].choices.length;o++){
-                                                    if(command.options[i].choices[o]){
-                                                        if(command.options[i].choices[o].name != that.options[i].choices[o].name){
+                                                if(command.options[i].choices.length != that.options[i].choices.length){
+                                                    edit = true;
+                                                }else{
+                                                    for(o=0;o<that.options[i].choices.length;o++){
+                                                        if(command.options[i].choices[o]){
+                                                            if(command.options[i].choices[o].name != that.options[i].choices[o].name){
+                                                                edit = true;
+                                                            }
+                                                            if(command.options[i].choices[o].value != that.options[i].choices[o].value){
+                                                                edit = true;
+                                                            }
+                                                        }else{
                                                             edit = true;
                                                         }
-                                                        if(command.options[i].choices[o].value != that.options[i].choices[o].value){
-                                                            edit = true;
-                                                        }
-                                                    }else{
-                                                        edit = true;
                                                     }
                                                 }
                                             }
+                                        }else{
+                                            edit = true;
                                         }
-                                    }else{
-                                        edit = true;
-                                    }
-                                }else{edit = true}
+                                    }else{edit = true}
+                                }
                             }
                         }
                         if(edit == false) {fouund = true;}else{ id = command.id;}
@@ -280,9 +299,9 @@ class guildSlashCommand{
                 if(edit == true){
                     await client.api.applications(client.user.id).guilds(that.guildID).commands(id).patch({
                         data: {
-                            "name": that.name !== undefined ? that.name : "command",
+                            "name": that.name ? that.name : "command",
                             "description": that.description !== undefined ? that.description : "A cool command",
-                            "options": that.options !== undefined ? that.options : [],
+                            "options": this.options ? this.options : [],
                             "default_permission":true,
                             "type":1
                         }
