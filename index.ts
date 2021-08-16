@@ -102,7 +102,7 @@ declare module "slash_commands.js" {
 
         readonly command_id:string;
 
-        readonly options:object
+        readonly options:messageOptions[];
 
         readonly channel:GuildChannel;
 
@@ -119,6 +119,12 @@ declare module "slash_commands.js" {
         readonly interaction: object;
 
         readonly client: Client;
+    }
+
+    class messageOptions{
+        readonly name:string;
+        readonly value:string;
+        readonly type:number;
     }
 
     /**
