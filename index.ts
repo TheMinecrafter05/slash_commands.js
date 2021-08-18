@@ -139,9 +139,10 @@ declare module "slash_commands.js" {
      * @param message The API message from the onExecute event.
      * @param text The text or the embed that gets send.
      * @param private determines if the message is public or can only be seen by the author.
-     */
+     * @param components add components like buttons or menus
+    */
 
-    function reply(message: slashResponse, text: string, private: boolean) : Promise<Message>
+    function reply(message: slashResponse, text: string, private: boolean, components:object) : Promise<Message>
 
     /**
      * Delete a slash command.
