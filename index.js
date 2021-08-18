@@ -416,20 +416,22 @@ function onExecute(client=discord.Client, listener = function(){}){
     });
 }
 
-async function reply(message,text, private=false){
+async function reply(message,text="", private=false, components=[]){
    await message.client.api.interactions(message.interaction.id, message.interaction.token).callback.post({
         data: {
-            type: 5,
+            type: 4,
             data:{
                 flags: private == true ? 64 : 0,
+                content: typeof(text) == "string" ? text : "",
+                embeds: typeof(text) == "object" ? [text] :  [],
+                components: components
             }
         }
     }).catch(err=>{
         if(err) {console.warn(err); return undefined;}
     })
-    let f = await new discord.WebhookClient(message.client.user.id,message.interaction.token).send(typeof(text) == "object" ? {embeds:[text]} : text)
-    let r = await message.channel.messages.fetch({limit: 15})
-    r = r.get(f.id);
+    let r = await message.channel.messages.fetch({limit: 15});
+    r = r.find(m=>m.content==typeof(text) == "string" ? text : "" && m.embeds[0] == typeof(text) == "object" ? text : {});
     return r ? r : undefined;
 }
 
