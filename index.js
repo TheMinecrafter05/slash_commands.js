@@ -4,7 +4,7 @@ const fetch = require("node-fetch");
 (async function wait(){
     let pr = await fetch("https://raw.githubusercontent.com/TheMinecrafter05/slash_commands.js/main/package.json", {method:"GET"})
     let r = await pr.json();
-    if(r.version != "1.5.5"){
+    if(r.version != "1.6.0"){
         setTimeout(()=>{
             console.error("There is a new version of slash_commands.js available.\nInstall it using npm i slash_commands.js")
         },5000)
@@ -427,8 +427,20 @@ async function reply(message,text="", private=false, components=[]){
                 components: components
             }
         }
-    }).catch(err=>{
-        if(err) {console.warn(err); return undefined;}
+    }).catch(async err=>{
+        if(err) {
+            await message.client.api.webhooks(message.client.user.id, message.interaction.token).post({
+                type: 4,
+                data:{
+                    flags: private == true ? 64 : 0,
+                    content: typeof(text) == "string" ? text : "",
+                    embeds: typeof(text) == "object" ? [text] :  [],
+                    components: components
+                }
+            }).catch(err=>{
+                if(err) {console.log(err); return undefined;}
+            })
+        }
     })
     let r = await message.channel.messages.fetch({limit: 15});
     r = r.find(m=>m.content==typeof(text) == "string" ? text : "" && m.embeds[0] == typeof(text) == "object" ? text : {});
