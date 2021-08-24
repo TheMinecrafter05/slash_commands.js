@@ -4,7 +4,7 @@ const fetch = require("node-fetch");
 (async function wait(){
     let pr = await fetch("https://raw.githubusercontent.com/TheMinecrafter05/slash_commands.js/main/package.json", {method:"GET"})
     let r = await pr.json();
-    if(r.version != "1.6.2"){
+    if(r.version != "1.6.5"){
         setTimeout(()=>{
             console.error("There is a new version of slash_commands.js available.\nInstall it using npm i slash_commands.js")
         },5000)
@@ -417,30 +417,23 @@ function onExecute(client=discord.Client, listener = function(){}){
 }
 
 async function reply(message,text="", private=false, components=[]){
+    let embed;
+    if(typeof(text) == "object" && text.length > 10 && text.type == "rich"){embed = [text]}else
+    if(typeof(text) == "object" && text.length <= 10 && !text.embeds){embed = text}else{
+        embed = []
+    }
    await message.client.api.interactions(message.interaction.id, message.interaction.token).callback.post({
         data: {
             type: 4,
             data:{
                 flags: private == true ? 64 : 0,
                 content: typeof(text) == "string" ? text : "",
-                embeds: typeof(text) == "object" ? [text] :  [],
+                embeds: embed,
                 components: components
             }
         }
-    }).catch(async err=>{
-        if(err) {
-            await message.client.api.webhooks(message.client.user.id, message.interaction.token).post({
-                type: 4,
-                data:{
-                    flags: private == true ? 64 : 0,
-                    content: typeof(text) == "string" ? text : "",
-                    embeds: typeof(text) == "object" ? [text] :  [],
-                    components: components
-                }
-            }).catch(err=>{
-                if(err) {console.log(err); return undefined;}
-            })
-        }
+    }).catch(err=>{
+        if(err) {console.warn(err); return undefined;}
     })
     let r = await message.channel.messages.fetch({limit: 15});
     r = r.find(m=>m.content==typeof(text) == "string" ? text : "" && m.embeds[0] == typeof(text) == "object" ? text : {});
