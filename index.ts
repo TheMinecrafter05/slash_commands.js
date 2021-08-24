@@ -66,9 +66,9 @@ declare module "slash_commands.js" {
         /** Sets the requirement of the option*/
         public setRequired(state: boolean) : slashOption
         /** Sets the type of the option*/
-        public setType(type:"string"|"number"|"boolean"|"user"|"channel"|"role") : slashOption;
+        public setType(type:slashChoiceType) : slashOption;
         /**Sets the choices of the option */
-        public addChoices(choices:object[]) : slashOption;
+        public setChoices(choices:object[]) : slashOption;
         /** Returns the name of the option*/
         readonly name: string;
         /** Returns the description of the option*/
@@ -78,6 +78,8 @@ declare module "slash_commands.js" {
         /**Returns the type of the option */
         readonly type : string;
     }
+
+    type slashChoiceType = "string"|"number"|"boolean"|"user"|"channel"|"role";
 
     /**
      * Creates a slash command option choice.
@@ -142,7 +144,7 @@ declare module "slash_commands.js" {
      * @param components add components like buttons or menus
     */
 
-    function reply(message: slashResponse, text: string, private: boolean, components:object) : Promise<Message>
+    function reply(message: slashResponse, text: string|object, private: boolean, components:object) : Promise<Message>
 
     /**
      * Delete a slash command.
