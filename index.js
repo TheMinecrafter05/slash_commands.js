@@ -432,8 +432,20 @@ async function reply(message,text="", private=false, components=[]){
                 components: components
             }
         }
-    }).catch(err=>{
-        if(err) {console.warn(err); return undefined;}
+    }).catch(async err=>{
+        if(err) {
+            await message.client.api.webhooks(message.client.user.id, message.interaction.token).post({
+                type: 4,
+                data:{
+                    flags: private == true ? 64 : 0,
+                    content: typeof(text) == "string" ? text : "",
+                    embeds: typeof(text) == "object" ? [text] :  [],
+                    components: components
+                }
+            }).catch(err=>{
+                if(err) {console.log(err); return undefined;}
+            })
+        }
     })
     let r = await message.channel.messages.fetch({limit: 15});
     r = r.find(m=>m.content==typeof(text) == "string" ? text : "" && m.embeds[0] == typeof(text) == "object" ? text : {});
