@@ -14,7 +14,7 @@ declare module "slash_commands.js" {
         public setName(name: string): slashCommand;
         /** Sets the description of the command*/
         public setDescription(description: string) : slashCommand;
-        /** Adds an option the command*/
+        /** @deprecated Adds an option the command*/
         public addOption(option: slashOption): slashCommand;
         /** Adds multiple options to the command*/
         public addOptions(options: object): slashCommand;
@@ -39,7 +39,7 @@ declare module "slash_commands.js" {
         public setDescription(description: string) : guildSlashCommand;
         /** Sets the guild ID of the command*/
         public setGuildID(guildID: string) : guildSlashCommand;
-        /** Adds an option the command*/
+        /** @deprecated Adds an option the command*/
         public addOption(option: slashOption): guildSlashCommand;
         /** Adds multiple options to the command*/
         public addOptions(options: object): guildSlashCommand;
@@ -162,4 +162,36 @@ declare module "slash_commands.js" {
     */
 
      function deleteGuildSlashCommand(client: Client, command: string, guildId: string): Promise<void>;
+
+     /**
+     * Get all slash commands.
+     * @param client The client that has the slash commands.
+    */
+
+    function getAllCommands(client: Client): Promise<void>;
+
+    /**
+     * Get all guild slash commands.
+     * @param client The client that has the guild slash command.
+     * @param guildId The guild ID of the guild command.
+    */
+
+     function getAllGuildCommands(client: Client, guildId: string): Promise<void>;
+
+     /**
+     * Get a specific slash command.
+     * @param client The client that has the guild slash command.
+     * @param name The name of the command.
+    */
+
+      function getCommand(client: Client, name: string): Promise<void>;
+
+      /**
+     * Get a specific guild slash command.
+     * @param client The client that has the guild slash command.
+     * @param guildID The guild ID of the guild command.
+     * @param name The name of the command.
+    */
+
+       function getGuildCommand(client: Client, guildID:string, name: string): Promise<void>;
 }
