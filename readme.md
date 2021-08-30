@@ -49,7 +49,7 @@ slash.onExecute(client, (message)=>{
 - __slash.onExecute(client: Discord.Client, listener?: (message: any)__ - listen when a command gets executed
 - __slash.reply(message: any, text: any, private: boolean)__ - reply with a message or embed
 - reply returns a Discord message, so you can edit, delete, react etc.
-Better documentation coming soon!
+### Better documentation coming soon!
 # WARNING
 ## Discord takes a lot of time to create or update a slash command. So be patient if you add one.
 ## Also you need to invite your bot with the application.commands permission:
