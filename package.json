@@ -1,6 +1,6 @@
 {
   "name": "slash_commands.js",
-  "version": "1.6.8",
+  "version": "1.7.0",
   "description": "Make easy discord.js slash commands.",
   "main": "index.js",
   "scripts": {
@@ -21,7 +21,7 @@
     "node-fetch": "^2.6.1"
   },
   "repository": {
-  "type": "git",
-  "url": "https://github.com/TheMinecrafter05/slash_commands.js.git"
+    "type": "git",
+    "url": "https://github.com/TheMinecrafter05/slash_commands.js.git"
   }
 }
