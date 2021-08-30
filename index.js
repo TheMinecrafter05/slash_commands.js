@@ -4,7 +4,7 @@ const fetch = require("node-fetch");
 (async function wait(){
     let pr = await fetch("https://raw.githubusercontent.com/TheMinecrafter05/slash_commands.js/main/package.json", {method:"GET"})
     let r = await pr.json();
-    if(r.version != "1.6.8"){
+    if(r.version != "1.7.0"){
         setTimeout(()=>{
             console.error("There is a new version of slash_commands.js available.\nInstall it using npm i slash_commands.js")
         },5000)
@@ -19,17 +19,24 @@ class slashCommand{
         this.description = "";
         this.options = []
         this.setName = function(name=""){
-            that.name = name.toLowerCase()
+            if(!name) throw new Error("No name provided.")
+            if(name.length > 32) throw new Error("The name is to long. Max 32 characters.")
+            name = name.toLowerCase()
+            if(/[^a-z]/i.test(name)) throw new Error("The name can only include characters from a to z")
+            that.name = name
             return that;
         }
 
         this.setDescription = function(description=""){
+            if(!description) throw new Error("No description provided.")
+            if(description.length > 100) throw new Error("The description is to long. Max 100 characters.")
             that.description = description;
             return that;
         }
 
         this.addOption = function(option=slashOption){
-            if(!option) throw new Error("No option provided.");
+            console.log("WARNING: addOption is deprecated. Please start using addOptions")
+            if(/[^a-z]/i.test(option["name"])) throw new Error("The name can only include characters from a to z")
             let cmd = {}
             cmd["name"] = option["name"].toLowerCase()
             cmd["description"] = option["description"]
@@ -37,14 +44,16 @@ class slashCommand{
             cmd["required"] = option["required"]
             cmd["choices"] = option["choices"]
             that.options.push(cmd)
+            return that
         }
 
-        this.addOptions = function(options=[]){
-            if(!options.length) throw new Error("Options need to be an object[]");
+        this.addOptions = function(...options){
             if(options.length == 0) throw new Error("No options provided.");
+            if(!options[0].name) options = options[0]
             for(var i=0;i<options.length;i++){
                 let cmd = {}
                 let option = options[i]
+                if(/[^a-z]/i.test(option["name"])) throw new Error("The name can only include characters from a to z")
                 cmd["name"] = option["name"].toLowerCase()
                 cmd["description"] = option["description"]
                 cmd["type"] = option["type"]
@@ -52,6 +61,7 @@ class slashCommand{
                 cmd["choices"] = option["choices"]
                 that.options.push(cmd)
             }
+            return that
         }
 
         let f = setInterval(async ()=>{
@@ -66,7 +76,6 @@ class slashCommand{
                 if(that.description.length > 100) throw new Error("Description must be shorter than 100 characters.");
                 for(var i=0;i<this.options.length;i++){
                     if(this.options[i].name.length > 32) throw new Error("Name must be shorter that 32 characters.");
-                    if(!this.options[i].description) throw new Error("No description provided.");
                     if(this.options[i].description.length > 100) throw new Error("Description must be shorter than 100 characters.");
                     if(!this.options[i].type) throw new Error("No type provided.");
                     if(this.options[i].type == "unvalid"){ throw new Error("Invalid type provided.")}
@@ -172,11 +181,17 @@ class guildSlashCommand{
         this.options = []
         this.guildID = ""
         this.setName = function(name=""){
+            if(!name) throw new Error("No name provided.")
+            if(name.length > 32) throw new Error("The name is to long. Max 32 characters.")
+            name = name.toLowerCase()
+            if(/[^a-z]/i.test(name)) throw new Error("The name can only include characters from a to z")
             that.name = name
             return that;
         }
 
         this.setDescription = function(description=""){
+            if(!description) throw new Error("No description provided.")
+            if(description.length > 100) throw new Error("The description is to long. Max 100 characters.")
             that.description = description;
             return that;
         }
@@ -188,7 +203,9 @@ class guildSlashCommand{
 
         this.addOption = function(option=slashOption){
             if(!option) throw new Error("No option provided.");
+            console.log("WARNING: setOption is deprecated. Please use addOptions.")
             let cmd = {}
+            if(/[^a-z]/i.test(option["name"])) throw new Error("The name can only include characters from a to z")
             cmd["name"] = option["name"].toLowerCase()
             cmd["description"] = option["description"]
             cmd["type"] = option["type"]
@@ -198,12 +215,13 @@ class guildSlashCommand{
             return that
         }
 
-        this.addOptions = function(options=[]){
-            if(!options.length) throw new Error("Options need to be an object[]");
+        this.addOptions = function(...options){
             if(options.length == 0) throw new Error("No options provided.");
+            if(!options[0].name) options = options[0]
             for(var i=0;i<options.length;i++){
                 let cmd = {}
                 let option = options[i]
+                if(/[^a-z]/i.test(option["name"])) throw new Error("The name can only include characters from a to z")
                 cmd["name"] = option["name"].toLowerCase()
                 cmd["description"] = option["description"]
                 cmd["type"] = option["type"]
@@ -229,7 +247,6 @@ class guildSlashCommand{
                 if(!this.name) throw new Error("No name provided.");
                 for(var i=0;i<this.options.length;i++){
                     if(this.options[i].name.length > 32) throw new Error("Name must be shorter that 32 characters.");
-                    if(!this.options[i].description) throw new Error("No description provided.");
                     if(this.options[i].description.length > 100) throw new Error("Description must be shorter than 100 characters.");
                     if(!this.options[i].type) throw new Error("No type provided.");
                     if(this.options[i].type == "unvalid"){ throw new Error("Invalid type provided.")}
@@ -416,7 +433,7 @@ function onExecute(client=discord.Client, listener = function(){}){
     });
 }
 
-async function reply(message,text="", private=false, components=[]){
+async function reply(message,text, private=false, components=[]){
     let embed;
     if(typeof(text) == "object" && text.length > 10 && text.type == "rich"){embed = [text]}else
     if(typeof(text) == "object" && text.length <= 10 && !text.embeds){embed = text}else{
@@ -480,4 +497,58 @@ async function deleteGuildSlashCommand(client, cmd="", guildId=""){
     },100)
 }
 
-module.exports = {slashCommand,guildSlashCommand,slashOption,slashOptionChoice, onExecute, reply, deleteSlashCommand, deleteGuildSlashCommand}
+async function getAllCommands(client){
+    if(!client) throw new Error("No client provided.")
+    let cmds = await client.api.applications(client.id).commands.get();
+    return cmds
+}
+
+async function getAllGuildCommands(client, guildID){
+    if(!client) throw new Error("No client provided.")
+    if(!guildID) throw new Error("No guild ID provided.")
+    let cmds = await client.api.applications(client.id).guilds(guildID).commands.get();
+    return cmds
+}
+
+async function getCommand(client, name){
+    if(!client) throw new Error("No client provided.")
+    if(!name) throw new Error("No name provided.")
+    let cmds = await getAllCommands(client);
+    let cmd;
+    for(i=0;i<cmds.length;i++){
+        if(cmds[i].name.toLowerCase() == name.toLowerCase()){
+            cmd = cmds[i];
+            break;
+        }
+    }
+    return cmd;
+}
+
+async function getGuildCommand(client, guildID, name){
+    if(!client) throw new Error("No client provided.")
+    if(!guildID) throw new Error("No guild ID provided.")
+    if(!name) throw new Error("No name provided.")
+    let cmds = await getAllGuildCommands(client,guildID);
+    let cmd;
+    for(i=0;i<cmds.length;i++){
+        if(cmds[i].name.toLowerCase() == name.toLowerCase()){
+            cmd = cmds[i];
+            break;
+        }
+    }
+    return cmd;
+}
+
+module.exports = {  slashCommand,
+                    guildSlashCommand,
+                    slashOption,
+                    slashOptionChoice,
+                    onExecute, 
+                    reply,
+                    deleteSlashCommand,
+                    deleteGuildSlashCommand,
+                    getAllCommands,
+                    getAllGuildCommands,
+                    getCommand,
+                    getGuildCommand
+                }
