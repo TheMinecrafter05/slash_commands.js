@@ -33,7 +33,7 @@ const helpCommand = new slash.slashCommand(client /*your discord client*/)
 ```javascript
 slash.onExecute(client, (message)=>{
     if(message.content == "help"){ // test if the command executed is the help command
-        slash.reply(message, "Hello!", false).then(msg=>{ //send a response (if you write true instead of false only you can see the message)
+        message.reply({content:"Hi", ephemeral:false}).then(msg=>{ //send a response (if you write true instead of false only you can see the message)
             setTimeout(()=>{
                 msg.edit({content:"bye!"}) //edit the message 
             },5000)
@@ -47,9 +47,7 @@ slash.onExecute(client, (message)=>{
 - __new slash.slashOption()__ - Creates a new slash option
 - __new slash.slashOptionChoice()__ - Creates a new slash option choice
 - __slash.onExecute(client: Discord.Client, listener?: (message: any)__ - listen when a command gets executed
-- __slash.reply(message: any, text: any, private: boolean)__ - reply with a message or embed
-- reply returns a Discord message, so you can edit, delete, react etc.
-### Better documentation coming soon!
+### A better documentation is coming soon!
 # WARNING
 ## Discord takes a lot of time to create or update a slash command. So be patient if you add one.
 ## Also you need to invite your bot with the application.commands permission:
