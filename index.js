@@ -4,7 +4,7 @@ const fetch = require("node-fetch");
 (async function wait(){
     let pr = await fetch("https://raw.githubusercontent.com/TheMinecrafter05/slash_commands.js/main/package.json", {method:"GET"})
     let r = await pr.json();
-    if(r.version != "1.7.5"){
+    if(r.version != "1.7.7"){
         setTimeout(()=>{
             console.error("There is a new version of slash_commands.js available.\nInstall it using npm i slash_commands.js")
         },5000)
@@ -496,7 +496,7 @@ async function rawedit(options, msgObj){
             content: options.content || "",
             flags: options.ephemeral ? options.ephemeral == true ? 64 : 0 : 0,
             embeds: options.embeds || [],
-            components: options.embeds || [],
+            components: options.components || [],
         }
     }else if(typeof(options[0]) == "object"){
         if(options[0].type){
