@@ -4,7 +4,7 @@ const fetch = require("node-fetch");
 (async function wait(){
     let pr = await fetch("https://raw.githubusercontent.com/TheMinecrafter05/slash_commands.js/main/package.json", {method:"GET"})
     let r = await pr.json();
-    if(r.version != "1.7.0"){
+    if(r.version != "1.7.5"){
         setTimeout(()=>{
             console.error("There is a new version of slash_commands.js available.\nInstall it using npm i slash_commands.js")
         },5000)
@@ -32,19 +32,6 @@ class slashCommand{
             if(description.length > 100) throw new Error("The description is to long. Max 100 characters.")
             that.description = description;
             return that;
-        }
-
-        this.addOption = function(option=slashOption){
-            console.log("WARNING: addOption is deprecated. Please start using addOptions")
-            if(/[^a-z]/i.test(option["name"])) throw new Error("The name can only include characters from a to z")
-            let cmd = {}
-            cmd["name"] = option["name"].toLowerCase()
-            cmd["description"] = option["description"]
-            cmd["type"] = option["type"]
-            cmd["required"] = option["required"]
-            cmd["choices"] = option["choices"]
-            that.options.push(cmd)
-            return that
         }
 
         this.addOptions = function(...options){
@@ -199,20 +186,6 @@ class guildSlashCommand{
         this.setGuildID = function(guildID){
             that.guildID = guildID;
             return that;
-        }
-
-        this.addOption = function(option=slashOption){
-            if(!option) throw new Error("No option provided.");
-            console.log("WARNING: setOption is deprecated. Please use addOptions.")
-            let cmd = {}
-            if(/[^a-z]/i.test(option["name"])) throw new Error("The name can only include characters from a to z")
-            cmd["name"] = option["name"].toLowerCase()
-            cmd["description"] = option["description"]
-            cmd["type"] = option["type"]
-            cmd["required"] = option["required"]
-            cmd["choices"] = option["choices"]
-            that.options.push(cmd)
-            return that
         }
 
         this.addOptions = function(...options){
@@ -413,7 +386,153 @@ class slashOptionChoice{
     }
 }
 
-function onExecute(client=discord.Client, listener = function(){}){
+function createReturnObject(data, msgObj){
+    let interaction = msgObj.interaction;
+    let client = msgObj.client;
+    return {
+        content:data.content,
+        command_id:interaction.data.id,
+        options:interaction.data.options,
+        channel:client.channels.cache.get(interaction.channel_id),
+        guild: client.guilds.cache.get(interaction.guild_id),
+        author: interaction.member ? interaction.member.user : undefined,
+        member: interaction.member,
+        application_id:interaction.application_id,
+        interaction: interaction,
+        client:client,
+        embeds:data.embeds,
+        components:data.components,
+        ephemeral:data.flags == 64 ? true : false,
+        reply: async (options)=>{
+            return await rawreply(options, msgObj)
+        },edit: async (options)=>{
+            return await rawedit(options, msgObj)
+        },delete: async ()=>{
+            return await rawdelete(msgObj)
+        }
+    }
+}
+
+async function rawreply(options, msgObj){
+    let data;
+    if(options.type){
+        data = {
+            content:"",
+            flags: options.ephemeral ? options.ephemeral == true ? 64 : 0 : 0,
+            embeds:[options],
+            components:[],
+        }
+    }else if(options.content || options.embeds || options.components){
+        data = {
+            content: options.content || "",
+            flags: options.ephemeral ? options.ephemeral == true ? 64 : 0 : 0,
+            embeds: options.embeds || [],
+            components: options.embeds || [],
+        }
+    }else if(typeof(options[0]) == "object"){
+        if(options[0].type){
+            if(options[0].type == "rich"){
+                data = {
+                    content:"",
+                    flags: options.ephemeral ? options.ephemeral == true ? 64 : 0 : 0,
+                    embeds:options,
+                    components:[],
+                }
+            }
+        }
+    }else{
+        data = {
+            content:options,
+            flags: options.ephemeral ? options.ephemeral == true ? 64 : 0 : 0,
+            embeds:[],
+            components:[],
+        }
+    }
+
+    if(data == undefined){
+        console.log(Error("The reply options are invalid."))
+    }
+
+    let message = msgObj
+
+    await message.client.api.interactions(message.interaction.id, message.interaction.token).callback.post({
+        data: {
+            type: 4,
+            data:data
+        }
+    }).catch(async err=>{
+        if(err) {
+            await message.client.api.webhooks(message.client.user.id, message.interaction.token).post({
+                type: 4,
+                data:data
+            }).catch(err=>{
+                if(err) {console.log(err); return undefined;}
+            })
+        }
+    })
+    return await createReturnObject(options, message)
+}
+
+async function rawdefer(message){
+    await message.client.api.interactions(message.interaction.id, message.interaction.token).callback.post({
+        data: {
+            type: 5,
+        }
+    })
+}
+
+async function rawedit(options, msgObj){
+    let data;
+    if(options.type){
+        data = {
+            content:"",
+            flags: options.ephemeral ? options.ephemeral == true ? 64 : 0 : 0,
+            embeds:[options],
+            components:[],
+        }
+    }else if(options.content || options.embeds || options.components){
+        data = {
+            content: options.content || "",
+            flags: options.ephemeral ? options.ephemeral == true ? 64 : 0 : 0,
+            embeds: options.embeds || [],
+            components: options.embeds || [],
+        }
+    }else if(typeof(options[0]) == "object"){
+        if(options[0].type){
+            if(options[0].type == "rich"){
+                data = {
+                    content:"",
+                    flags: options.ephemeral ? options.ephemeral == true ? 64 : 0 : 0,
+                    embeds:options,
+                    components:[],
+                }
+            }
+        }
+    }else{
+        data = {
+            content:options,
+            flags: 0,
+            embeds:[],
+            components:[],
+        }
+    }
+
+    if(data == undefined){
+        console.log(Error("The reply options are invalid."))
+    }
+
+    let f = await msgObj.client.api.webhooks(msgObj.client.user.id, msgObj.interaction.token).messages("@original").patch({type:4, data:data})
+
+    return await createReturnObject(f, msgObj);
+}
+
+async function rawdelete(msgObj){
+    await msgObj.client.api.webhooks(msgObj.client.user.id, msgObj.interaction.token).messages("@original").delete()
+
+    return true;
+}
+
+function onExecute(client, listener = function(){}){
     client.ws.on('INTERACTION_CREATE', async interaction => {
         if(!interaction.data.name) return;
         let msgObj = {
@@ -423,17 +542,24 @@ function onExecute(client=discord.Client, listener = function(){}){
             options:interaction.data.options,
             channel:client.channels.cache.get(interaction.channel_id),
             guild: client.guilds.cache.get(interaction.guild_id),
-            author: interaction.member.user,
+            author: interaction.member ? interaction.member.user : undefined,
             member: interaction.member,
             application_id:interaction.application_id,
             interaction: interaction,
-            client:client
+            client:client,
+            reply: async (options)=>{
+                return await rawreply(options, msgObj)
+            },
+            defer: async ()=>{
+                return await rawdefer(msgObj)
+            }
         }
         listener(msgObj)
     });
 }
 
 async function reply(message,text, private=false, components=[]){
+    console.log("WARNING: .reply() is deprecated. Please start using the reply function from the slashInteraction.\nMore information here: https://www.npmjs.com/package/slash_commands.js")
     let embed;
     if(typeof(text) == "object" && text.length > 10 && text.type == "rich"){embed = [text]}else
     if(typeof(text) == "object" && text.length <= 10 && !text.embeds){embed = text}else{
@@ -474,9 +600,10 @@ async function deleteSlashCommand(client, cmd=""){
         if(client.readyAt != null){
             clearInterval(f)
             let list = await client.api.applications(client.user.id).commands.get()
-            list.forEach(command=>{
+            list.forEach(async command=>{
                 if(command.name == cmd){
-                    client.api.applications(client.user.id).commands(command.id).delete().catch(console.error)
+                    await client.api.applications(client.user.id).commands(command.id).delete().catch(console.error)
+                    console.log("Deleted slash command "+command.name);
                 }
             })
         }
@@ -488,9 +615,10 @@ async function deleteGuildSlashCommand(client, cmd="", guildId=""){
         if(client.readyAt != null){
             clearInterval(f)
             let list = await client.api.applications(client.user.id).guilds(guildId).commands.get()
-            list.forEach(command=>{
+            list.forEach(async command=>{
                 if(command.name == cmd){
-                    client.api.applications(client.user.id).guilds(guildId).commands(command.id).delete().catch(console.error)
+                    await client.api.applications(client.user.id).guilds(guildId).commands(command.id).delete().catch(console.error)
+                    console.log("Deleted guild slash command "+command.name);
                 }
             })
         }
@@ -499,14 +627,14 @@ async function deleteGuildSlashCommand(client, cmd="", guildId=""){
 
 async function getAllCommands(client){
     if(!client) throw new Error("No client provided.")
-    let cmds = await client.api.applications(client.id).commands.get();
+    let cmds = await client.api.applications(client.user.id).commands.get();
     return cmds
 }
 
 async function getAllGuildCommands(client, guildID){
     if(!client) throw new Error("No client provided.")
     if(!guildID) throw new Error("No guild ID provided.")
-    let cmds = await client.api.applications(client.id).guilds(guildID).commands.get();
+    let cmds = await client.api.applications(client.user.id).guilds(guildID).commands.get();
     return cmds
 }
 
