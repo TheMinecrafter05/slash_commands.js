@@ -427,14 +427,15 @@ async function rawreply(options, msgObj){
             content: options.content || "",
             flags: options.ephemeral ? options.ephemeral == true ? 64 : 0 : 0,
             embeds: options.embeds || [],
-            components: options.embeds || [],
+            components: options.components || [],
         }
     }else if(typeof(options[0]) == "object"){
+        console.log(options[0].type)
         if(options[0].type){
             if(options[0].type == "rich"){
                 data = {
                     content:"",
-                    flags: options.ephemeral ? options.ephemeral == true ? 64 : 0 : 0,
+                    flags: 0,
                     embeds:options,
                     components:[],
                 }
