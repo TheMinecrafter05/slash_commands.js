@@ -1,4 +1,4 @@
-import { Channel, Client, Guild, GuildChannel, GuildMember, Message, User } from "discord.js";
+import { Channel, Client, Guild, GuildChannel, GuildMember, Message, MessageEmbed, User } from "discord.js";
 
 declare module "slash_commands.js" {
     
@@ -14,8 +14,6 @@ declare module "slash_commands.js" {
         public setName(name: string): slashCommand;
         /** Sets the description of the command*/
         public setDescription(description: string) : slashCommand;
-        /** @deprecated Adds an option the command*/
-        public addOption(option: slashOption): slashCommand;
         /** Adds multiple options to the command*/
         public addOptions(options: object): slashCommand;
         /** Returns the name of the command*/
@@ -39,8 +37,6 @@ declare module "slash_commands.js" {
         public setDescription(description: string) : guildSlashCommand;
         /** Sets the guild ID of the command*/
         public setGuildID(guildID: string) : guildSlashCommand;
-        /** @deprecated Adds an option the command*/
-        public addOption(option: slashOption): guildSlashCommand;
         /** Adds multiple options to the command*/
         public addOptions(options: object): guildSlashCommand;
         /** Returns the name of the command*/
@@ -97,7 +93,7 @@ declare module "slash_commands.js" {
         readonly value: string;
     }
 
-    class slashResponse{
+    class slashInteraction{
         readonly content: string;
 
         readonly id:string;
@@ -121,6 +117,38 @@ declare module "slash_commands.js" {
         readonly interaction: object;
 
         readonly client: Client;
+
+        /**Reply to an interaction
+         * @param options can be only text, only embed or an object that contains them.
+        */
+
+        public reply(options:string|MessageEmbed|replyObject) : Promise<slashResponse>
+    }
+
+    class slashResponse{
+        content:string;
+        command_id:string;
+        options:replyObject;
+        channel:GuildChannel;
+        guild: Guild;
+        author: User;
+        member: GuildMember;
+        application_id:string;
+        interaction:any;
+        client:Client;
+        embeds:object;
+        components:object;
+        ephemeral:boolean;
+        public reply(options:replyObject) : Promise<slashResponse>;
+        public edit(options:replyObject) : Promise<slashResponse>;
+        public delete() : Promise<any>;
+    }
+
+    class replyObject{
+        content:string;
+        embeds:object;
+        components:object;
+        ephemeral:boolean;
     }
 
     class messageOptions{
@@ -134,17 +162,18 @@ declare module "slash_commands.js" {
      * @param client The client that the message was sent from.
      * @param listener Gets called when a slash command gets executed. Returns void.
      */
-    function onExecute(client: Client, listener : (message: slashResponse) => void) : Promise<void>;
+    function onExecute(client: Client, listener : (message: slashInteraction) => void) : Promise<void>;
 
     /**
      * Respond to a slash command with a message or an embed.
+     * @deprecated
      * @param message The API message from the onExecute event.
      * @param text The text or the embed that gets send.
      * @param private determines if the message is public or can only be seen by the author.
      * @param components add components like buttons or menus
     */
 
-    function reply(message: slashResponse, text: string|object, private: boolean, components:object) : Promise<Message>
+    function reply(message: slashInteraction, text: string|object, private: boolean, components:object) : Promise<Message>
 
     /**
      * Delete a slash command.
