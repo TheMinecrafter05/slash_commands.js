@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>slash_commands.js docs</title>
+
+    <style>
+        *{
+            margin:0;
+            font-family: Arial, Helvetica, sans-serif;
+            color:white
+        }
+        body{
+            background-color: rgb(29, 29, 29);
+        }
+
+        #title{
+            margin-top: 2%;
+            width: 100%;
+            height: 5%;
+            text-align: center;
+            text-decoration: underline;
+        }
+        #subtitle{
+            margin-top: 1%;
+            width: 100%;
+            height: 2.5%;
+            text-align: center;
+        }
+
+        #header{
+            margin-left: 4%;
+            color:rgb(72, 72, 255);
+            margin-top: 5%;
+            font-size: 250%;
+            font-weight: 1000;
+            text-decoration: underline;
+            text-decoration-color: rgb(100, 100, 255);
+        }
+
+        #point{
+            margin-top: 3.5%;
+            margin-left: 4%;
+            font-size: 150%;
+        }
+
+        #point_desc{
+            margin-top: 1%;
+            margin-left: 4%;
+            font-size: 125%;
+        }
+
+        #link{
+            color:lightblue;
+        }
+
+        #wordNew{
+            color:purple;
+        }
+
+        #classObject{
+            color:darkseagreen;
+        }
+
+        #functionObject{
+            color:rgb(173, 173, 0);
+        }
+
+        #propertyObject{
+            color:darkcyan;
+            font-size: 130%;
+        }
+
+        #example{
+            margin-top: 2.5%;
+            font-family: monospace;
+            margin-left: 4%;
+            width: 40%;
+            height: 200px;
+            resize: none;
+            background-color: rgb(75, 75, 75);
+            border-radius: 10px;
+            font-size: 130%;
+        }
+
+        #pointpoint{
+            margin-top: 1%;
+            margin-left: 5%;
+            font-size: 125%;
+        }
+
+        #pointpoint_desc{
+            margin-top: 1%;
+            margin-left: 5%;
+            font-size: 120%;
+            margin-bottom: 2%;
+        }
+
+        #string{
+            color:burlywood;
+        }
+
+        #number{
+            color: aquamarine;
+        }
+
+        #object{
+            color:darkolivegreen;
+        }
+
+        #function{
+            color:rgb(173, 173, 0);
+        }
+
+        #boolean{
+            color:chocolate;
+        }
+
+        #end{
+            position: absolute;
+            top:2000%;
+        }
+
+        #end2{
+            position: absolute;
+            top:1990%;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="title">Slash_Commands.js documentation</h1>
+    <h2 id="subtitle">I made this in 30 minutes.</h2>
+
+    <li id="header">Classes</li>
+
+    <li id="point"><span id="wordNew">new</span> <span id="classObject">slashCommand</span>(client: <a id="link" href="https://discord.js.org/#/docs/main/stable/class/Client">Client</a>)</li>
+    <p id="point_desc">Creates a global slash command that <a id="link" href="https://discord.com/developers/docs/interactions/application-commands#making-a-global-command">is cached for 1 hour</a>.</p>
+    <textarea disabled=true id="example">
+
+ Example:
+
+ new slashCommand(client)
+ .setName("kick")
+ .setDescription("The kick command.")
+ .addOption(kickcommandOption) //need to declare a slashOption
+    </textarea>
+    <li id="point"><span id="wordNew">new</span> <span id="classObject">guildSlashCommand</span>(client: <a id="link" href="https://discord.js.org/#/docs/main/stable/class/Client">Client</a>)</li>
+    <p id="point_desc">Creates a guild specific slash command that refreshes instantly.</p>
+    <textarea disabled=true id="example">
+
+ Example:
+
+ new guildSlashCommand(client)
+ .setName("kick")
+ .setDescription("The help command.")
+ .setGuildID("1234567890987654")
+ .addOption(kickcommandOption) //need to declare a slashOption
+        </textarea>
+
+        <li id="point"><span id="wordNew">new</span> <span id="classObject">slashOption</span>()</li>
+        <p id="point_desc">Creates a option for a slash command.</p>
+        <textarea disabled=true id="example">
+    
+ Example:
+    
+ new slashOption()
+ .setName("user")
+ .setDescription("the user you want to kick")
+ .setRequired(true)
+ .setType("user") //types: user; channel; role; boolean; number; string;
+            </textarea>
+
+            <li id="point"><span id="wordNew">new</span> <span id="classObject">slashOptionChoice</span>()</li>
+        <p id="point_desc">Creates a choice for a slash option.</p>
+        <textarea disabled=true id="example">
+    
+ Example:
+    
+ new slashOptionChoice()
+ .setName("Number 1")
+ .setValue("num1") //this is what you'll get as a response if someone chooses it
+            </textarea>
+
+    <li id="header">Functions</li>
+
+    <li id="point"><span id="wordNew"></span> <span id="functionObject">onCommandExecute</span>(callback: <a id="link" href="#slashInteraction">slashInteraction</a>)</li>
+    <p id="point_desc">Fires the callback when a slash command gets executed. Returns the slash interaction with the command, choices, options etc.</p>
+
+    <textarea disabled=true id="example">
+    
+
+ Example:
+           
+ onCommandExecute(async message=>{
+     console.log(message.content) //returns the command name, for example "kick"
+ })
+    </textarea>
+
+    <li id="header">Properties</li>
+
+    <li id="point"><span id="propertyObject">slashInteraction</span></li>
+    <p id="point_desc">Gets returned from the onCommandExecute event.</p>
+    <li id="pointpoint">content: <span id="string">String</span></li>
+    <li id="pointpoint">id: <span id="number">Number</span></li>
+    <li id="pointpoint">command_id: <span id="number">Number</span></li>
+    <li id="pointpoint">options: <a href="https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-interaction-data-option-structure"><span id="object">Object</span></a></li>
+    <li id="pointpoint">channel: <a href="https://discord.js.org/#/docs/main/stable/class/Channel"><span id="object">Discord Channel</span></a></li>
+    <li id="pointpoint">guild: <a href="https://discord.js.org/#/docs/main/stable/class/Guild"><span id="object">Discord Guild</span></a></li>
+    <li id="pointpoint">author: <a href="https://discord.js.org/#/docs/main/stable/class/User"><span id="object">Discord User</span></a></li>
+    <li id="pointpoint">member: <a href="https://discord.js.org/#/docs/main/stable/class/GuildMember"><span id="object">Guild Member</span></a></li>
+    <li id="pointpoint">application_id: <span id="number">Number</span></li>
+    <li id="pointpoint">interaction: <a href="https://discord.com/developers/docs/interactions/receiving-and-responding#interactions"><span id="object">Interaction</span></a></li>
+    <li id="pointpoint">client: <a href="https://discord.js.org/#/docs/main/stable/class/Client"><span id="object">Client</span></a></li>
+    <li id="pointpoint">reply(<span id="string">string</span> | <span id="object">embed</span> | <a id="link" href="#replyObject">replyObject</a>) : <a id="link" href="#slashResponse">slashResponse</a> | <span id="function">Method</span></li>
+    <p id="pointpoint_desc">Reply to a slash command.</p>
+    <li id="pointpoint">defer() : <span id="boolean">boolean</span> | <span id="function">Method</span></li>
+    <p id="pointpoint_desc">If you know the response is taking longer than 3 seconds, you can let the bot <a id="link" href="https://cdn.discordapp.com/attachments/755041077055979650/886702262955683911/unknown.png">think</a>, until you do reply().</p>
+
+    <li id="point"><span id="propertyObject">slashResponse</span></li>
+    <p id="point_desc">Gets returned from the slashInteraction.reply() method.</p>
+
+    <li id="pointpoint">content: <span id="string">String</span></li>
+    <li id="pointpoint">command_id: <span id="number">Number</span></li>
+    <li id="pointpoint">options: <span id="object">Object</span></li>
+    <li id="pointpoint">channel: <span id="object">Discord Channel</span></li>
+    <li id="pointpoint">guild: <span id="object">Discord Guild</span></li>
+    <li id="pointpoint">author: <span id="object">Discord User</span></li>
+    <li id="pointpoint">member: <span id="object">Guild Member</span></li>
+    <li id="pointpoint">application_id: <span id="number">Number</span></li>
+    <li id="pointpoint">interaction: <span id="object">Interaction</span></li>
+    <li id="pointpoint">client: <span id="object">Client</span></li>
+    <li id="pointpoint">embeds: <span id="object">Embeds Object</span></li>
+    <li id="pointpoint">components: <span id="object">Components Object</span></li>
+    <li id="pointpoint">ephemeral: <span id="boolean">boolean</span></li>
+    <li id="pointpoint">reply(replyObject) : <a id="link" href="#slashResponse">slashResponse</a> | <span id="function">Method</span></li>
+    <p id="pointpoint_desc">Reply with a slashResponse to the slashResponse</p>
+    <li id="pointpoint">edit(replyObject) : <a id="link" href="#slashResponse">slashResponse</a> | <span id="function">Method</span></li>
+    <p id="pointpoint_desc">Edit a slashResponse</p>
+    <li id="pointpoint">delete() : <span id="boolean">boolean</span> | <span id="function">Method</span></li>
+    <p id="pointpoint_desc">Delete a slashResponse</p>
+
+    <li id="point"><span id="propertyObject">replyObject</span></li>
+    <p id="point_desc">Argument for the slashResponse for editing or replying.</p>
+
+    <li id="pointpoint">content: <span id="string">String</span></li>
+    <li id="pointpoint">embeds: <span id="object">Object</span></li>
+    <li id="pointpoint">components: <span id="object">Object</span></li>
+    <li id="pointpoint">ephemeral: <span id="boolean">boolean</span></li>
+
+
+    <li id="header">Examples</li>
+    <p id="point_desc">Some examples if you dont understand the rest.</p>
+
+    <textarea disabled=true id="example">
+ Response with embed, content, components and its private:
+
+ onCommandExecute(client, message=>{
+     if(message.content == "hello"){
+         let embed = new MessageEmbed()
+         .setDescription("World!")
+
+         let row = new MessageActionRow()
+         .addComponents(
+             new MessageButton()
+             .setLabel("Hi!")
+             .setStyle("SUCCESS")
+             .setCustomId("button1")
+         )
+
+         message.reply({content:"Hello", embeds:[embed], components:[row], ephemeral:true});
+     }
+ })
+
+
+ Create a command:
+
+ new slashCommand()
+ .setName("help")
+ .setDescription("Help command")
+    </textarea>
+
+    <p id="end">‍If you read this you gay lol</p>
+    <img id="end2" src="https://c.tenor.com/u9XnPveDa9AAAAAM/rick-rickroll.gif" alt="this slowpoke moves"  width="250" />
+</body>
+</html>
