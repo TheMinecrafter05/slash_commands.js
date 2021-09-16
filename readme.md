@@ -43,11 +43,7 @@ slash.onExecute(client, (message)=>{
 ```
 
 # Documentation
-- __new slash.slashCommand( client: Discord.Client )__ - Creates a new slash command
-- __new slash.slashOption()__ - Creates a new slash option
-- __new slash.slashOptionChoice()__ - Creates a new slash option choice
-- __slash.onExecute(client: Discord.Client, listener?: (message: any)__ - listen when a command gets executed
-### A better documentation is coming soon!
+## https://theminecrafter05.github.io/slash_commands.js/index.html
 # WARNING
 ## Discord takes a lot of time to create or update a slash command. So be patient if you add one.
 ## Also you need to invite your bot with the application.commands permission:
