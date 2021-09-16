@@ -1,4 +1,4 @@
-import { Channel, Client, Guild, GuildChannel, GuildMember, Message, MessageEmbed, User } from "discord.js";
+import { Client, Guild, GuildChannel, GuildMember, Message, MessageEmbed, User } from "discord.js";
 
 declare module "slash_commands.js" {
     
@@ -102,43 +102,48 @@ declare module "slash_commands.js" {
 
         readonly options:messageOptions[];
 
-        readonly channel:GuildChannel;
+        channel:GuildChannel;
 
-        readonly guild: Guild;
+        guild: Guild;
 
-        readonly author: User;
+        author: User;
 
-        readonly member: GuildMember;
+        member: GuildMember;
 
-        readonly user: User;
+        user: User;
 
         readonly application_id:string;
 
-        readonly interaction: object;
+        interaction: object;
 
-        readonly client: Client;
+        client: Client;
 
         /**Reply to an interaction
          * @param options can be only text, only embed or an object that contains them.
         */
 
         public reply(options:string|MessageEmbed|replyObject) : Promise<slashResponse>
+
+        /**Defer an interaction*/
+
+        public defer() : Promise<boolean>
     }
 
     class slashResponse{
-        content:string;
-        command_id:string;
-        options:replyObject;
+        readonly content:string;
+        readonly command_id:string;
+        readonly command_name:string;
+        readonly options:replyObject;
         channel:GuildChannel;
         guild: Guild;
         author: User;
         member: GuildMember;
-        application_id:string;
+        readonly application_id:string;
         interaction:any;
         client:Client;
-        embeds:object;
-        components:object;
-        ephemeral:boolean;
+        readonly embeds:object;
+        readonly components:object;
+        readonly ephemeral:boolean;
         public reply(options:replyObject) : Promise<slashResponse>;
         public edit(options:replyObject) : Promise<slashResponse>;
         public delete() : Promise<any>;
