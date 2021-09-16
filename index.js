@@ -1,10 +1,11 @@
 const discord = require("discord.js");
 const fetch = require("node-fetch");
-
+let starterBot;
+let cmdlist = [];
 (async function wait(){
     let pr = await fetch("https://raw.githubusercontent.com/TheMinecrafter05/slash_commands.js/main/package.json", {method:"GET"})
     let r = await pr.json();
-    if(r.version != "1.7.7"){
+    if(r.version != "1.8.0"){
         setTimeout(()=>{
             console.error("There is a new version of slash_commands.js available.\nInstall it using npm i slash_commands.js")
         },5000)
@@ -15,6 +16,7 @@ class slashCommand{
     constructor(client=discord.Client){
         let that = this;
         this.client = client;
+        starterBot = client;
         this.name = "";
         this.description = "";
         this.options = []
@@ -154,6 +156,7 @@ class slashCommand{
                         if(err) return new Error(err)
                     });
                 }
+                cmdlist.push(that.name)
             }
         },100)
     }
@@ -163,6 +166,7 @@ class guildSlashCommand{
     constructor(client=discord.Client){
         let that = this;
         this.client = client;
+        starterBot = client;
         this.name = "";
         this.description = "";
         this.options = []
@@ -311,6 +315,7 @@ class guildSlashCommand{
                         if(err) return new Error(err)
                     });
                 }
+                cmdlistguild.push(that.name)
             }
         },100)
     }
@@ -386,17 +391,18 @@ class slashOptionChoice{
     }
 }
 
-function createReturnObject(data, msgObj){
+async function createReturnObject(data, msgObj){
     let interaction = msgObj.interaction;
     let client = msgObj.client;
     return {
         content:data.content,
         command_id:interaction.data.id,
+        command_name:interaction.data.name,
         options:interaction.data.options,
         channel:client.channels.cache.get(interaction.channel_id),
-        guild: client.guilds.cache.get(interaction.guild_id),
-        author: interaction.member ? interaction.member.user : undefined,
-        member: interaction.member,
+        guild: client.guilds.cache.get(interaction.guild_id) || undefined,
+        author: client.users.cache.get(interaction.member ? interaction.member.user.id : interaction.user.id) || await client.users.fetch(interaction.member ? interaction.member.user.id : interaction.user.id).catch(err=>{return}) || interaction.member ? interaction.member.user : interaction.user,
+        member: client.guilds.cache.get(interaction.guild_id) ? client.guilds.cache.get(interaction.guild_id).members.cache.get(interaction.member ? interaction.member.user.id : interaction.user.id) || await client.guilds.cache.get(interaction.guild_id).members.fetch(interaction.member ? interaction.member.user.id : interaction.user.id).catch(err=>{return undefined}) || undefined : undefined,
         application_id:interaction.application_id,
         interaction: interaction,
         client:client,
@@ -475,11 +481,19 @@ async function rawreply(options, msgObj){
 }
 
 async function rawdefer(message){
+    let er = 0;
     await message.client.api.interactions(message.interaction.id, message.interaction.token).callback.post({
         data: {
             type: 5,
         }
+    }).catch(err=>{
+        if(err) er = 1;
     })
+    if(er == 1){
+        return false;
+    }else{
+        return true;
+    }
 }
 
 async function rawedit(options, msgObj){
@@ -544,7 +558,7 @@ function onExecute(client, listener = function(){}){
             channel:client.channels.cache.get(interaction.channel_id),
             guild: client.guilds.cache.get(interaction.guild_id),
             author: interaction.member ? interaction.member.user : undefined,
-            member: interaction.member,
+            member: client.guilds.cache.get(interaction.guild_id) ? client.guilds.cache.get(interaction.guild_id).members.cache.get(interaction.member ? interaction.member.user.id : interaction.user.id) || await client.guilds.cache.get(interaction.guild_id).members.fetch(interaction.member ? interaction.member.user.id : interaction.user.id).catch(err=>{return}) || undefined : undefined,
             application_id:interaction.application_id,
             interaction: interaction,
             client:client,
@@ -667,6 +681,20 @@ async function getGuildCommand(client, guildID, name){
     }
     return cmd;
 }
+
+let autodelete = setInterval(async ()=>{
+    if(starterBot ? starterBot.readyAt != null : 1+1==3){
+        clearInterval(autodelete);
+        setTimeout(async ()=>{
+            let cmds = await getAllCommands(starterBot);
+            cmds.forEach(async cmd=>{
+                if(!cmdlist.includes(cmd.name)){
+                    await deleteSlashCommand(starterBot, cmd.name)
+                }
+            })
+        },10000)
+    }
+},1000)
 
 module.exports = {  slashCommand,
                     guildSlashCommand,
