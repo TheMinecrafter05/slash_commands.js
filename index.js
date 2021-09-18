@@ -5,7 +5,7 @@ let cmdlist = [];
 (async function wait(){
     let pr = await fetch("https://raw.githubusercontent.com/TheMinecrafter05/slash_commands.js/main/package.json", {method:"GET"})
     let r = await pr.json();
-    if(r.version != "1.8.0"){
+    if(r.version != "1.8.1"){
         setTimeout(()=>{
             console.error("There is a new version of slash_commands.js available.\nInstall it using npm i slash_commands.js")
         },5000)
@@ -315,7 +315,6 @@ class guildSlashCommand{
                         if(err) return new Error(err)
                     });
                 }
-                cmdlistguild.push(that.name)
             }
         },100)
     }
