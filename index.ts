@@ -122,7 +122,7 @@ declare module "slash_commands.js" {
          * @param options can be only text, only embed or an object that contains them.
         */
 
-        public reply(options:string|MessageEmbed|replyObject) : Promise<slashResponse>
+        public reply(options:string|replyObject) : Promise<slashResponse>
 
         /**Defer an interaction*/
 
@@ -147,6 +147,8 @@ declare module "slash_commands.js" {
         public reply(options:replyObject) : Promise<slashResponse>;
         public edit(options:replyObject) : Promise<slashResponse>;
         public delete() : Promise<any>;
+        public react(emoji:string|object) : Promise<slashResponse>
+        public fetch() : Promise<Message>
     }
 
     class replyObject{
