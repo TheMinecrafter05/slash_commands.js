@@ -1,11 +1,9 @@
 const discord = require("discord.js");
 const fetch = require("node-fetch");
-let starterBot;
-let cmdlist = [];
 (async function wait(){
     let pr = await fetch("https://raw.githubusercontent.com/TheMinecrafter05/slash_commands.js/main/package.json", {method:"GET"})
     let r = await pr.json();
-    if(r.version != "1.8.1"){
+    if(r.version != "1.8.5"){
         setTimeout(()=>{
             console.error("There is a new version of slash_commands.js available.\nInstall it using npm i slash_commands.js")
         },5000)
@@ -16,7 +14,6 @@ class slashCommand{
     constructor(client=discord.Client){
         let that = this;
         this.client = client;
-        starterBot = client;
         this.name = "";
         this.description = "";
         this.options = []
@@ -156,7 +153,6 @@ class slashCommand{
                         if(err) return new Error(err)
                     });
                 }
-                cmdlist.push(that.name)
             }
         },100)
     }
@@ -166,7 +162,6 @@ class guildSlashCommand{
     constructor(client=discord.Client){
         let that = this;
         this.client = client;
-        starterBot = client;
         this.name = "";
         this.description = "";
         this.options = []
@@ -390,6 +385,18 @@ class slashOptionChoice{
     }
 }
 
+class commandGroup{
+    constructor(){
+        let that = this;
+    }
+}
+
+class subCommand{
+    constructor(){
+        let that = this;
+    }
+}
+
 async function createReturnObject(data, msgObj){
     let interaction = msgObj.interaction;
     let client = msgObj.client;
@@ -414,6 +421,10 @@ async function createReturnObject(data, msgObj){
             return await rawedit(options, msgObj)
         },delete: async ()=>{
             return await rawdelete(msgObj)
+        },react: async (emoji)=>{
+            return await rawreact(emoji, msgObj)
+        },fetch: async ()=>{
+            return await rawfetch(msgObj)
         }
     }
 }
@@ -435,7 +446,6 @@ async function rawreply(options, msgObj){
             components: options.components || [],
         }
     }else if(typeof(options[0]) == "object"){
-        console.log(options[0].type)
         if(options[0].type){
             if(options[0].type == "rich"){
                 data = {
@@ -456,7 +466,7 @@ async function rawreply(options, msgObj){
     }
 
     if(data == undefined){
-        console.log(Error("The reply options are invalid."))
+        return console.log(Error("The reply options are invalid."))
     }
 
     let message = msgObj
@@ -471,8 +481,8 @@ async function rawreply(options, msgObj){
             await message.client.api.webhooks(message.client.user.id, message.interaction.token).post({
                 type: 4,
                 data:data
-            }).catch(err=>{
-                if(err) {console.log(err); return undefined;}
+            }).catch(err2=>{
+                if(err2) {console.log(err);console.log(err2); return undefined;}
             })
         }
     })
@@ -544,6 +554,40 @@ async function rawdelete(msgObj){
     await msgObj.client.api.webhooks(msgObj.client.user.id, msgObj.interaction.token).messages("@original").delete()
 
     return true;
+}
+
+async function rawreact(emoji, msgObj){
+    if(!emoji) return console.log(Error("No emoji provided."))
+    if(emoji.length == 2){
+        emoji = encodeURIComponent(emoji);
+    }else{
+        if(emoji.name || emoji.id){
+            emoji = `${emoji.name}:${emoji.id}`;
+        }else if(emoji.includes("<") && emoji.includes(">") && emoji.includes(":")){
+            if(emoji.includes("<a:")){
+                emoji = emoji.replace("<a:","").replace(">","")
+            }else{
+                emoji = emoji.replace("<","").replace(">","")
+            }
+        }
+    }
+
+    let client = msgObj.client;
+
+    let msg = await client.api.webhooks(msgObj.client.user.id, msgObj.interaction.token).messages("@original").get();
+
+    await client.api.channels(msgObj.channel.id).messages(msg.id).reactions(emoji)("@me").put();
+
+    return createReturnObject(msg, msgObj);
+}
+
+async function rawfetch(msgObj){
+    let msg = await client.api.webhooks(msgObj.client.user.id, msgObj.interaction.token).messages("@original").get();
+    if(msg){
+        return msg
+    }else{
+        return undefined;
+    }
 }
 
 function onExecute(client, listener = function(){}){
@@ -680,20 +724,6 @@ async function getGuildCommand(client, guildID, name){
     }
     return cmd;
 }
-
-let autodelete = setInterval(async ()=>{
-    if(starterBot ? starterBot.readyAt != null : 1+1==3){
-        clearInterval(autodelete);
-        setTimeout(async ()=>{
-            let cmds = await getAllCommands(starterBot);
-            cmds.forEach(async cmd=>{
-                if(!cmdlist.includes(cmd.name)){
-                    await deleteSlashCommand(starterBot, cmd.name)
-                }
-            })
-        },10000)
-    }
-},1000)
 
 module.exports = {  slashCommand,
                     guildSlashCommand,
