@@ -3,7 +3,7 @@ const fetch = require("node-fetch");
 (async function wait(){
     let pr = await fetch("https://raw.githubusercontent.com/TheMinecrafter05/slash_commands.js/main/package.json", {method:"GET"})
     let r = await pr.json();
-    if(r.version != "1.8.5"){
+    if(r.version != "1.8.7"){
         setTimeout(()=>{
             console.error("There is a new version of slash_commands.js available.\nInstall it using npm i slash_commands.js")
         },5000)
@@ -21,7 +21,7 @@ class slashCommand{
             if(!name) throw new Error("No name provided.")
             if(name.length > 32) throw new Error("The name is to long. Max 32 characters.")
             name = name.toLowerCase()
-            if(/[^a-z]/i.test(name)) throw new Error("The name can only include characters from a to z")
+            if(/[^a-z+_]/i.test(name)) throw new Error("The name can only include characters from a to z")
             that.name = name
             return that;
         }
@@ -39,12 +39,14 @@ class slashCommand{
             for(var i=0;i<options.length;i++){
                 let cmd = {}
                 let option = options[i]
-                if(/[^a-z]/i.test(option["name"])) throw new Error("The name can only include characters from a to z")
+                if(/[^a-z+_]/i.test(option["name"])) throw new Error("The name can only include characters from a to z")
                 cmd["name"] = option["name"].toLowerCase()
-                cmd["description"] = option["description"]
+                cmd["description"] = option["description"] || "‍"
                 cmd["type"] = option["type"]
-                cmd["required"] = option["required"]
-                cmd["choices"] = option["choices"]
+                if(option["required"]) cmd["required"] = option["required"]
+                if(option["choices"]) cmd["choices"] = option["choices"]
+                if(option["subCommands"]) cmd["options"] = option["subCommands"]
+                if(option["options"]) cmd["options"] = option["options"]
                 that.options.push(cmd)
             }
             return that
@@ -53,8 +55,8 @@ class slashCommand{
         let f = setInterval(async ()=>{
             if(client.readyAt != null){
                 clearInterval(f)
-                let fouund = false;
                 let edit = false;
+                let found = false;
                 let id;
                 if(!that.name) throw new Error("No name provided.");
                 if(that.name.length > 32) throw new Error("Name must be shorter than 32 characters.");
@@ -65,11 +67,13 @@ class slashCommand{
                     if(this.options[i].description.length > 100) throw new Error("Description must be shorter than 100 characters.");
                     if(!this.options[i].type) throw new Error("No type provided.");
                     if(this.options[i].type == "unvalid"){ throw new Error("Invalid type provided.")}
-                    for(var o=0;o<this.options[i].choices.length;o++){
-                        if(!this.options[i].choices[o].name) throw new Error("No name provided.");
-                        if(!this.options[i].choices[o].value) throw new Error("No value provided.");
-                        if(this.options[i].choices[o].value.toString().length > 100) throw new Error("Value must be shorter than 100 characters.");
-                        if(this.options[i].choices[o].name.length > 100) throw new Error("Name must be shorter than 100 characters.");
+                    if(this.options[i].choices){
+                        for(var o=0;o<this.options[i].choices.length;o++){
+                            if(!this.options[i].choices[o].name) throw new Error("No name provided.");
+                            if(!this.options[i].choices[o].value) throw new Error("No value provided.");
+                            if(this.options[i].choices[o].value.toString().length > 100) throw new Error("Value must be shorter than 100 characters.");
+                            if(this.options[i].choices[o].name.length > 100) throw new Error("Name must be shorter than 100 characters.");
+                        }
                     }
                 }
                 let hfejhf = await client.api.applications(client.user.id).commands.get();
@@ -100,22 +104,50 @@ class slashCommand{
                                             if(!command.options[i].choices && that.options[i].choices || command.options[i].choices && !that.options[i].choices){
                                                 edit = true;
                                             }else{
-                                                if(command.options[i].choices.length != that.options[i].choices.length){
-                                                    edit = true;
-                                                }else{
-                                                    for(o=0;o<that.options[i].length;o++){
-                                                        if(command.options[i].choices){
-                                                            if(command.options[i].choices[o].name != that.options[i].choices[o].name){
+                                                if(command.options[i].choices){
+                                                    if(command.options[i].choices.length != that.options[i].choices.length){
+                                                        edit = true;
+                                                    }else{
+                                                        for(o=0;o<that.options[i].choices.length;o++){
+                                                            if(command.options[i].choices[o]){
+                                                                if(command.options[i].choices[o].name != that.options[i].choices[o].name){
+                                                                    edit = true;
+                                                                }
+                                                                if(command.options[i].choices[o].value != that.options[i].choices[o].value){
+                                                                    edit = true;
+                                                                }
+                                                            }else{
                                                                 edit = true;
                                                             }
-                                                            if(command.options[i].choices[o].value != that.options[i].choices[o].value){
-                                                                edit = true;
-                                                            }
-                                                        }else{
-                                                            edit = true;
                                                         }
                                                     }
                                                 }
+                                            }
+
+                                            if(!command.options[i].options && that.options[i].options || command.options[i].options && !that.options[i].options){
+                                                edit = true;
+                                            }else{
+                                                if(command.options[i].options){
+                                                    if(command.options[i].options.length != that.options[i].options.length){
+                                                        edit = true;
+                                                    }else{
+                                                        for(o=0;o<that.options[i].options.length;o++){
+                                                            if(command.options[i].options[o]){
+                                                                if(command.options[i].options[o].name != that.options[i].options[o].name){
+                                                                    edit = true;
+                                                                }
+                                                                if(command.options[i].options[o].description != that.options[i].options[o].description){
+                                                                    edit = true;
+                                                                }
+                                                            }else{
+                                                                edit = true;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            if(that.options[i].type == 2 && !that.options[i].options){
+                                                throw new Error("No subcommands provided.")
                                             }
                                         }else{
                                             edit = true;
@@ -124,34 +156,35 @@ class slashCommand{
                                 }
                             }
                         }
-                        if(edit == false) {fouund = true;}else{ id = command.id;}
+                        if( edit == false ){ found = true } else { id = command.id; }
                     }
                 })
-                if(fouund == true) return;
-                if(edit == true){
-                    await client.api.applications(client.user.id).commands(id).patch({
-                        data: {
-                            "name": that.name !== undefined ? that.name : "command",
-                            "description": that.description !== undefined ? that.description : "A cool command",
-                            "options": that.options !== undefined ? that.options : [],
-                            "default_permission":true,
-                            "type":1
-                        }
-                    }).catch(err=>{
-                        if(err) return new Error(err)
-                    });
-                }else{
-                    await client.api.applications(client.user.id).commands.post({
-                        data: {
-                            "name": that.name !== undefined ? that.name : "command",
-                            "description": that.description !== undefined ? that.description : "A cool command",
-                            "options": that.options !== undefined ? that.options : [],
-                            "default_permission":true,
-                            "type":1
-                        }
-                    }).catch(err=>{
-                        if(err) return new Error(err)
-                    });
+                if(found == false){
+                    if(edit == true){
+                        await client.api.applications(client.user.id).commands(id).patch({
+                            data: {
+                                "name": that.name !== undefined ? that.name : "command",
+                                "description": that.description !== undefined ? that.description : "A cool command",
+                                "options": that.options !== undefined ? that.options : [],
+                                "default_permission":true,
+                                "type":1
+                            }
+                        }).catch(err=>{
+                            if(err) return new Error(err)
+                        });
+                    }else{
+                        await client.api.applications(client.user.id).commands.post({
+                            data: {
+                                "name": that.name !== undefined ? that.name : "command",
+                                "description": that.description !== undefined ? that.description : "A cool command",
+                                "options": that.options !== undefined ? that.options : [],
+                                "default_permission":true,
+                                "type":1
+                            }
+                        }).catch(err=>{
+                            if(err) return new Error(err)
+                        });
+                    }
                 }
             }
         },100)
@@ -170,7 +203,7 @@ class guildSlashCommand{
             if(!name) throw new Error("No name provided.")
             if(name.length > 32) throw new Error("The name is to long. Max 32 characters.")
             name = name.toLowerCase()
-            if(/[^a-z]/i.test(name)) throw new Error("The name can only include characters from a to z")
+            if(/[^a-z+_]/i.test(name)) throw new Error("The name can only include characters from a to z")
             that.name = name
             return that;
         }
@@ -193,12 +226,14 @@ class guildSlashCommand{
             for(var i=0;i<options.length;i++){
                 let cmd = {}
                 let option = options[i]
-                if(/[^a-z]/i.test(option["name"])) throw new Error("The name can only include characters from a to z")
+                if(/[^a-z+_]/i.test(option["name"])) throw new Error("The name can only include characters from a to z")
                 cmd["name"] = option["name"].toLowerCase()
-                cmd["description"] = option["description"]
+                cmd["description"] = option["description"] || "‍"
                 cmd["type"] = option["type"]
-                cmd["required"] = option["required"]
-                cmd["choices"] = option["choices"]
+                if(option["required"]) cmd["required"] = option["required"]
+                if(option["choices"]) cmd["choices"] = option["choices"]
+                if(option["subCommands"]) cmd["options"] = option["subCommands"]
+                if(option["options"]) cmd["options"] = option["options"]
                 that.options.push(cmd)
             }
             return that;
@@ -207,8 +242,8 @@ class guildSlashCommand{
         let f = setInterval(async ()=>{
             if(client.readyAt != null){
                 clearInterval(f)
-                let fouund = false;
                 let edit = false;
+                let found = false;
                 let id;
                 if(!that.name) throw new Error("No name provided.");
                 if(that.name.length > 32) throw new Error("Name must be shorter than 32 characters.");
@@ -222,11 +257,13 @@ class guildSlashCommand{
                     if(this.options[i].description.length > 100) throw new Error("Description must be shorter than 100 characters.");
                     if(!this.options[i].type) throw new Error("No type provided.");
                     if(this.options[i].type == "unvalid"){ throw new Error("Invalid type provided.")}
-                    for(var o=0;o<this.options[i].choices.length;o++){
-                        if(!this.options[i].choices[o].name) throw new Error("No name provided.");
-                        if(!this.options[i].choices[o].value) throw new Error("No value provided.");
-                        if(this.options[i].choices[o].value.toString().length > 100) throw new Error("Value must be shorter than 100 characters.");
-                        if(this.options[i].choices[o].name.length > 100) throw new Error("Name must be shorter than 100 characters.");
+                    if(this.options[i].choices){
+                        for(var o=0;o<this.options[i].choices.length;o++){
+                            if(!this.options[i].choices[o].name) throw new Error("No name provided.");
+                            if(!this.options[i].choices[o].value) throw new Error("No value provided.");
+                            if(this.options[i].choices[o].value.toString().length > 100) throw new Error("Value must be shorter than 100 characters.");
+                            if(this.options[i].choices[o].name.length > 100) throw new Error("Name must be shorter than 100 characters.");
+                        }
                     }
                 }
                 let hfejhf = await client.api.applications(client.user.id).guilds(that.guildID).commands.get();
@@ -257,22 +294,50 @@ class guildSlashCommand{
                                             if(!command.options[i].choices && that.options[i].choices || command.options[i].choices && !that.options[i].choices){
                                                 edit = true;
                                             }else{
-                                                if(command.options[i].choices.length != that.options[i].choices.length){
-                                                    edit = true;
-                                                }else{
-                                                    for(o=0;o<that.options[i].choices.length;o++){
-                                                        if(command.options[i].choices[o]){
-                                                            if(command.options[i].choices[o].name != that.options[i].choices[o].name){
+                                                if(command.options[i].choices){
+                                                    if(command.options[i].choices.length != that.options[i].choices.length){
+                                                        edit = true;
+                                                    }else{
+                                                        for(o=0;o<that.options[i].choices.length;o++){
+                                                            if(command.options[i].choices[o]){
+                                                                if(command.options[i].choices[o].name != that.options[i].choices[o].name){
+                                                                    edit = true;
+                                                                }
+                                                                if(command.options[i].choices[o].value != that.options[i].choices[o].value){
+                                                                    edit = true;
+                                                                }
+                                                            }else{
                                                                 edit = true;
                                                             }
-                                                            if(command.options[i].choices[o].value != that.options[i].choices[o].value){
-                                                                edit = true;
-                                                            }
-                                                        }else{
-                                                            edit = true;
                                                         }
                                                     }
                                                 }
+                                            }
+
+                                            if(!command.options[i].options && that.options[i].options || command.options[i].options && !that.options[i].options){
+                                                edit = true;
+                                            }else{
+                                                if(command.options[i].options){
+                                                    if(command.options[i].options.length != that.options[i].options.length){
+                                                        edit = true;
+                                                    }else{
+                                                        for(o=0;o<that.options[i].options.length;o++){
+                                                            if(command.options[i].options[o]){
+                                                                if(command.options[i].options[o].name != that.options[i].options[o].name){
+                                                                    edit = true;
+                                                                }
+                                                                if(command.options[i].options[o].description != that.options[i].options[o].description){
+                                                                    edit = true;
+                                                                }
+                                                            }else{
+                                                                edit = true;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            if(that.options[i].type == 2 && !that.options[i].options){
+                                                throw new Error("No subcommands provided.")
                                             }
                                         }else{
                                             edit = true;
@@ -281,34 +346,35 @@ class guildSlashCommand{
                                 }
                             }
                         }
-                        if(edit == false) {fouund = true;}else{ id = command.id;}
+                        if(edit == false){ found = true } else {id = command.id;}
                     }
                 })
-                if(fouund == true) return;
-                if(edit == true){
-                    await client.api.applications(client.user.id).guilds(that.guildID).commands(id).patch({
-                        data: {
-                            "name": that.name ? that.name : "command",
-                            "description": that.description !== undefined ? that.description : "A cool command",
-                            "options": this.options ? this.options : [],
-                            "default_permission":true,
-                            "type":1
-                        }
-                    }).catch(err=>{
-                        if(err) return new Error(err)
-                    });
-                }else{
-                    await client.api.applications(client.user.id).guilds(that.guildID).commands.post({
-                        data: {
-                            "name": that.name !== undefined ? that.name : "command",
-                            "description": that.description !== undefined ? that.description : "A cool command",
-                            "options": that.options !== undefined ? that.options : [],
-                            "default_permission":true,
-                            "type":1
-                        }
-                    }).catch(err=>{
-                        if(err) return new Error(err)
-                    });
+                if(found == false){
+                    if(edit == true){
+                        await client.api.applications(client.user.id).guilds(that.guildID).commands(id).patch({
+                            data: {
+                                "name": that.name ? that.name : "command",
+                                "description": that.description !== undefined ? that.description : "A cool command",
+                                "options": this.options ? this.options : [],
+                                "default_permission":true,
+                                "type":1
+                            }
+                        }).catch(err=>{
+                            if(err) return new Error(err)
+                        });
+                    }else{
+                        await client.api.applications(client.user.id).guilds(that.guildID).commands.post({
+                            data: {
+                                "name": that.name !== undefined ? that.name : "command",
+                                "description": that.description !== undefined ? that.description : "A cool command",
+                                "options": that.options !== undefined ? that.options : [],
+                                "default_permission":true,
+                                "type":1
+                            }
+                        }).catch(err=>{
+                            if(err) return new Error(err)
+                        });
+                    }
                 }
             }
         },100)
@@ -388,12 +454,72 @@ class slashOptionChoice{
 class commandGroup{
     constructor(){
         let that = this;
+        this.name = ""
+        this.type = 2
+        this.subCommands = []
+        this.description = ""
+
+        this.setName = function(name=""){
+            if(/[^a-z+_]/i.test(name)) throw new Error("The name can only include characters from a to z")
+            that.name = name;
+            return that;
+        }
+
+        this.setDescription = function(desc=""){
+            if(desc.length > 100) throw new Error("The description cant be longer than 100 characters.");
+            that.description = desc;
+            return that;
+        }
+
+        this.setSubCommands = function(...subCommands){
+            if(subCommands.length == 0) throw new Error("No options provided.");
+            if(!subCommands[0].name) subCommands = subCommands[0]
+
+            for(var i=0;i<subCommands.length;i++){
+                that.subCommands.push(subCommands[i])
+            }
+            return that;
+        }
     }
 }
 
 class subCommand{
     constructor(){
         let that = this;
+        this.name = ""
+        this.type = 1
+        this.description = ""
+        this.options = []
+
+        this.setName = function(name=""){
+            if(/[^a-z+_]/i.test(name)) throw new Error("The name can only include characters from a to z")
+            that.name = name;
+            return that;
+        }
+
+        this.setDescription = function(desc=""){
+            if(desc.length > 100) throw new Error("The description cant be longer than 100 characters.");
+            that.description = desc;
+            return that;
+        }
+
+        this.addOptions = function(...options){
+            if(options.length == 0) throw new Error("No options provided.");
+            if(!options[0].name) options = options[0]
+            for(var i=0;i<options.length;i++){
+                let cmd = {}
+                let option = options[i]
+                if(/[^a-z+_]/i.test(option["name"])) throw new Error("The name can only include characters from a to z")
+                cmd["name"] = option["name"].toLowerCase()
+                cmd["description"] = option["description"]
+                cmd["type"] = option["type"]
+                if(option["required"]) cmd["required"] = option["required"]
+                if(option["choices"]) if(option["choices"].length > 0) cmd["choices"] = option["choices"]
+                if(option["subCommands"]) cmd["options"] = option["subCommands"]
+                that.options.push(cmd)
+            }
+            return that;
+        }
     }
 }
 
@@ -616,43 +742,6 @@ function onExecute(client, listener = function(){}){
     });
 }
 
-async function reply(message,text, private=false, components=[]){
-    console.log("WARNING: .reply() is deprecated. Please start using the reply function from the slashInteraction.\nMore information here: https://www.npmjs.com/package/slash_commands.js")
-    let embed;
-    if(typeof(text) == "object" && text.length > 10 && text.type == "rich"){embed = [text]}else
-    if(typeof(text) == "object" && text.length <= 10 && !text.embeds){embed = text}else{
-        embed = []
-    }
-   await message.client.api.interactions(message.interaction.id, message.interaction.token).callback.post({
-        data: {
-            type: 4,
-            data:{
-                flags: private == true ? 64 : 0,
-                content: typeof(text) == "string" ? text : "",
-                embeds: embed,
-                components: components
-            }
-        }
-    }).catch(async err=>{
-        if(err) {
-            await message.client.api.webhooks(message.client.user.id, message.interaction.token).post({
-                type: 4,
-                data:{
-                    flags: private == true ? 64 : 0,
-                    content: typeof(text) == "string" ? text : "",
-                    embeds: typeof(text) == "object" ? [text] :  [],
-                    components: components
-                }
-            }).catch(err=>{
-                if(err) {console.log(err); return undefined;}
-            })
-        }
-    })
-    let r = await message.channel.messages.fetch({limit: 15});
-    r = r.find(m=>m.content==typeof(text) == "string" ? text : "" && m.embeds[0] == typeof(text) == "object" ? text : {});
-    return r ? r : undefined;
-}
-
 async function deleteSlashCommand(client, cmd=""){
     let f = setInterval(async ()=>{
         if(client.readyAt != null){
@@ -725,16 +814,35 @@ async function getGuildCommand(client, guildID, name){
     return cmd;
 }
 
+async function deleteAllSlashCommands(client){
+    let cmds = await getAllCommands(client);
+    for(i=0;i<cmds.length;i++){
+        await deleteSlashCommand(client,cmds[i].name)
+    }
+    return;
+}
+
+async function deleteAllGuildSlashCommands(client, guildId){
+    let gcmds = await getAllGuildCommands(client,guildId);
+    for(i=0;i<gcmds.length;i++){
+        await deleteGuildSlashCommand(client,gcmds[i].name,guildId)
+    }
+    return;
+}
+
 module.exports = {  slashCommand,
                     guildSlashCommand,
                     slashOption,
                     slashOptionChoice,
+                    commandGroup,
+                    subCommand,
                     onExecute, 
-                    reply,
                     deleteSlashCommand,
                     deleteGuildSlashCommand,
                     getAllCommands,
                     getAllGuildCommands,
                     getCommand,
-                    getGuildCommand
+                    getGuildCommand,
+                    deleteAllSlashCommands,
+                    deleteAllGuildSlashCommands,
                 }
