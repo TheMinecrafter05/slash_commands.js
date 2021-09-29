@@ -1,4 +1,4 @@
-import { Client, Guild, GuildChannel, GuildMember, Message, MessageEmbed, User } from "discord.js";
+import { Client, ClientVoiceManager, Guild, GuildChannel, GuildMember, Message, MessageEmbed, User } from "discord.js";
 
 declare module "slash_commands.js" {
     
@@ -15,7 +15,7 @@ declare module "slash_commands.js" {
         /** Sets the description of the command*/
         public setDescription(description: string) : slashCommand;
         /** Adds multiple options to the command*/
-        public addOptions(options: object): slashCommand;
+        public addOptions(options: slashOption | subCommand): slashCommand;
         /** Returns the name of the command*/
         readonly name: string;
         /** Returns the description of the command*/
@@ -38,7 +38,7 @@ declare module "slash_commands.js" {
         /** Sets the guild ID of the command*/
         public setGuildID(guildID: string) : guildSlashCommand;
         /** Adds multiple options to the command*/
-        public addOptions(options: object): guildSlashCommand;
+        public addOptions(options: slashOption | subCommand | commandGroup): guildSlashCommand;
         /** Returns the name of the command*/
         readonly name: string;
         /** Returns the description of the command*/
@@ -81,7 +81,7 @@ declare module "slash_commands.js" {
      * Creates a slash command option choice.
     */
 
-     export class slashOptionChoice {
+    export class slashOptionChoice {
         constructor();
         /** Sets the name of the choice*/
         public setName(name: string): slashOptionChoice;
@@ -91,6 +91,44 @@ declare module "slash_commands.js" {
         readonly name: string;
         /** Returns the value of the choice*/
         readonly value: string;
+    }
+
+    export class commandGroup{
+        constructor();
+        /** Sets the name of the group*/
+        public setName(name:string) : commandGroup;
+        /** Sets the description of the group*/
+        public setDescription(description: string) : commandGroup;
+        /** Sets the sub commands of the group*/
+        public setSubCommands(subCommands:object[]) : commandGroup;
+
+        /** Returns the name of the group*/
+        readonly name:string;
+        /** Returns the description of the group*/
+        readonly description:string;
+        /** Returns the type of the group*/
+        readonly type:string;
+        /** Returns the subcommands of the group*/
+        readonly subCommands:string;
+    }
+
+    export class subCommand{
+        constructor()
+        /** Sets the name of the subcommand*/
+        public setName(name:string) : subCommand;
+        /** Sets the description of the subcommand*/
+        public setDescription(description: string) : subCommand;
+        /** Sets the options of the subcommand*/
+        public addOptions(options: slashOption): guildSlashCommand;
+
+        /** Returns the name of the subcommand*/
+        readonly name:string;
+        /** Returns the description of the subcommand*/
+        readonly description:string;
+        /** Returns the options of the subcommand*/
+        readonly options:object[]
+        /** Returns the type of the subcommand*/
+        readonly type:string;
     }
 
     class slashInteraction{
@@ -230,4 +268,18 @@ declare module "slash_commands.js" {
     */
 
        function getGuildCommand(client: Client, guildID:string, name: string): Promise<void>;
+
+       /**
+        * Delete all slash commands the bot has. (Does not includes guild specific slash commands)
+        * @param client The client that has the guild slash command.
+        */
+
+       function deleteAllSlashCommands(client: Client) : Promise<void>;
+
+       /**
+        * Delete all guild slash commands the bot has. (Does not includes slash commands)
+        * @param client The client that has the guild slash command.
+        */
+
+        function deleteAllGuildSlashCommands(client: Client, guildId: string) : Promise<void>;
 }
