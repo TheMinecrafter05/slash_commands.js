@@ -27,7 +27,7 @@ const helpcommandOption = new slash.slashOption()
 const helpCommand = new slash.slashCommand(client /*your discord client*/)
 .setName("help")
 .setDescription("The help command.")
-.addOption(helpcommandOption) //add the option declared on the top
+.addOptions(helpcommandOption) //add the option declared on the top
 ```
 ## Respond Example
 ```javascript
